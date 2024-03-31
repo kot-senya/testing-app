@@ -1,0 +1,93 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EntranseTesting.TestMatchTheElement"
+             x:DataType="vm:MainWindowViewModel"
+             xmlns:vm="using:EntranseTesting.ViewModels">
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="20 0" Spacing="15" Background="Transparent">
+
+        <!-- Задание -->
+        <TextBlock Text="{Binding TestPages.TestME.Question}"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Stretch"
+                    TextWrapping="Wrap"/>
+
+        <!-- Контейнер с элементами для соотношения -->
+        <Grid Name="MainContainer"
+              ColumnDefinitions="2*,*,2*"
+              HorizontalAlignment="Stretch">
+
+          <!--// Элементы 1 группы //-->
+          <StackPanel Orientation="Vertical" Grid.Column="0">
+
+            <TextBlock Text="{Binding TestPages.TestME.NameGroup1}"
+                       TextAlignment="Center"
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Center"
+                       TextWrapping="Wrap"/>
+
+            <ItemsRepeater ItemsSource="{Binding TestPages.TestME.ElementMatchGroup1}" Margin="15"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Stretch"
+                           MinWidth="100" MaxWidth="300">
+              <ItemsRepeater.Layout>
+                <StackLayout Spacing="10" Orientation="Vertical"/>
+              </ItemsRepeater.Layout>
+              <ItemsRepeater.ItemTemplate>
+                <DataTemplate>
+                  <Border Padding="10 5"
+                          Background="#DAE8FC" CornerRadius="5"
+                          Cursor="Hand"
+                          PointerPressed="OnPointerPressed">
+                    <TextBlock Text="{Binding Name}"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap"/>
+                  </Border>
+                </DataTemplate>
+              </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+
+          </StackPanel>
+
+          <!--// Элементы 2 группы//-->
+          <StackPanel Orientation="Vertical" Grid.Column="2">
+
+            <TextBlock Text="{Binding TestPages.TestME.NameGroup1}"
+                       TextAlignment="Center"
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Center"
+                       TextWrapping="Wrap"/>
+
+            <ItemsRepeater ItemsSource="{Binding TestPages.TestME.ElementMatchGroup2}" Margin="15"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Stretch"
+                           MinWidth="100" MaxWidth="400">
+              <ItemsRepeater.Layout>
+                <StackLayout Spacing="10" Orientation="Vertical"/>
+              </ItemsRepeater.Layout>
+              <ItemsRepeater.ItemTemplate>
+                <DataTemplate>
+                  <Border Padding="10 5"
+                          Background="#DAE8FC" CornerRadius="5"
+                          Cursor="Hand"
+                          PointerPressed="OnPointerPressed">
+                    <TextBlock Text="{Binding Name}"
+                               TextAlignment="Left"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap"/>
+                  </Border>
+                </DataTemplate>
+              </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+  </ScrollViewer>
+</UserControl>

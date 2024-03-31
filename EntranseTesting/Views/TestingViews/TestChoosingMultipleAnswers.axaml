@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EntranseTesting.TestChoosingMultipleAnswers"
+             x:DataType="vm:MainWindowViewModel"
+             xmlns:vm="using:EntranseTesting.ViewModels">
+
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="20 0" Spacing="15" Background="Transparent">
+
+      <!-- Задание -->
+      <TextBlock Text="{Binding TestPages.TestCMA.Question}"
+                  VerticalAlignment="Top"
+                  HorizontalAlignment="Stretch"
+                  TextWrapping="Wrap"/>
+
+      <!-- Контейнер с элементами выбора -->
+      <ItemsRepeater ItemsSource="{Binding TestPages.TestCMA.Element}" Margin="15"
+                          VerticalAlignment="Center"
+                          HorizontalAlignment="Left">
+        <ItemsRepeater.Layout>
+          <StackLayout Spacing="10" Orientation="Vertical"/>
+        </ItemsRepeater.Layout>
+        <ItemsRepeater.ItemTemplate>
+          <DataTemplate>
+            <CheckBox Content="{Binding Name}"
+                      IsChecked="{Binding Correctly, Mode=OneWayToSource}"
+                      TextBlock.TextWrapping="Wrap"/>
+          </DataTemplate>
+        </ItemsRepeater.ItemTemplate>
+      </ItemsRepeater>
+
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
