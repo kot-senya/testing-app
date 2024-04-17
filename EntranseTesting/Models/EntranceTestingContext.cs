@@ -15,6 +15,8 @@ public partial class EntranceTestingContext : DbContext
     {
     }
 
+    public virtual DbSet<AppSetting> AppSettings { get; set; }
+
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<ElementOfArrangement> ElementOfArrangements { get; set; }
@@ -31,13 +33,19 @@ public partial class EntranceTestingContext : DbContext
 
     public virtual DbSet<Group> Groups { get; set; }
 
+    public virtual DbSet<HintImage> HintImages { get; set; }
+
+    public virtual DbSet<HintText> HintTexts { get; set; }
+
     public virtual DbSet<Question> Questions { get; set; }
+
+    public virtual DbSet<QuestionHint> QuestionHints { get; set; }
 
     public virtual DbSet<QuestionImage> QuestionImages { get; set; }
 
-    public virtual DbSet<QuestionVariant> QuestionVariants { get; set; }
-
     public virtual DbSet<RatioOfElementEquality> RatioOfElementEqualities { get; set; }
+
+    public virtual DbSet<RootUser> RootUsers { get; set; }
 
     public virtual DbSet<TextOfPutting> TextOfPuttings { get; set; }
 
@@ -61,6 +69,30 @@ public partial class EntranceTestingContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<AppSetting>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("app_settings_pk");
+
+            entity.ToTable("app_settings");
+
+            entity.Property(e => e.Id)
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("id");
+            entity.Property(e => e.CountOfHints).HasColumnName("count_of_hints");
+            entity.Property(e => e.CountOfQuestions).HasColumnName("count_of_questions");
+            entity.Property(e => e.DateOfChanging)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("date_of_changing");
+            entity.Property(e => e.HalfCost).HasColumnName("half_cost");
+            entity.Property(e => e.HalfVisibility).HasColumnName("half_visibility");
+            entity.Property(e => e.HintVisibility).HasColumnName("hint_visibility");
+            entity.Property(e => e.Raiting3).HasColumnName("raiting3");
+            entity.Property(e => e.Raiting4).HasColumnName("raiting4");
+            entity.Property(e => e.Raiting5).HasColumnName("raiting5");
+            entity.Property(e => e.ResultVisibiliry).HasColumnName("result_visibiliry");
+            entity.Property(e => e.Time).HasColumnName("time");
+        });
+
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("category_pk");
@@ -213,6 +245,37 @@ public partial class EntranceTestingContext : DbContext
                 .HasConstraintName("group_question_fk");
         });
 
+        modelBuilder.Entity<HintImage>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("hint_image_pk");
+
+            entity.ToTable("hint_image");
+
+            entity.Property(e => e.Id)
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("id");
+            entity.Property(e => e.IdHint).HasColumnName("id_hint");
+            entity.Property(e => e.Image).HasColumnName("image");
+
+            entity.HasOne(d => d.IdHintNavigation).WithMany(p => p.HintImages)
+                .HasForeignKey(d => d.IdHint)
+                .HasConstraintName("hint_image_hint_text_fk");
+        });
+
+        modelBuilder.Entity<HintText>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("hint_text_pk");
+
+            entity.ToTable("hint_text");
+
+            entity.Property(e => e.Id)
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("id");
+            entity.Property(e => e.Text)
+                .HasColumnType("character varying")
+                .HasColumnName("text");
+        });
+
         modelBuilder.Entity<Question>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("question_pk");
@@ -223,6 +286,7 @@ public partial class EntranceTestingContext : DbContext
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("id");
             entity.Property(e => e.IdCategory).HasColumnName("id_category");
+            entity.Property(e => e.InTest).HasColumnName("in_test");
             entity.Property(e => e.Name)
                 .HasColumnType("character varying")
                 .HasColumnName("name");
@@ -231,6 +295,28 @@ public partial class EntranceTestingContext : DbContext
             entity.HasOne(d => d.IdCategoryNavigation).WithMany(p => p.Questions)
                 .HasForeignKey(d => d.IdCategory)
                 .HasConstraintName("question_category_fk");
+        });
+
+        modelBuilder.Entity<QuestionHint>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("question_hint_pk");
+
+            entity.ToTable("question_hint");
+
+            entity.Property(e => e.Id)
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("id");
+            entity.Property(e => e.Cost).HasColumnName("cost");
+            entity.Property(e => e.IdHint).HasColumnName("id_hint");
+            entity.Property(e => e.IdQuestion).HasColumnName("id_question");
+
+            entity.HasOne(d => d.IdHintNavigation).WithMany(p => p.QuestionHints)
+                .HasForeignKey(d => d.IdHint)
+                .HasConstraintName("question_hint_hint_text_fk");
+
+            entity.HasOne(d => d.IdQuestionNavigation).WithMany(p => p.QuestionHints)
+                .HasForeignKey(d => d.IdQuestion)
+                .HasConstraintName("question_hint_question_fk");
         });
 
         modelBuilder.Entity<QuestionImage>(entity =>
@@ -248,23 +334,6 @@ public partial class EntranceTestingContext : DbContext
             entity.HasOne(d => d.IdQuestionNavigation).WithMany(p => p.QuestionImages)
                 .HasForeignKey(d => d.IdQuestion)
                 .HasConstraintName("question_image_question_fk");
-        });
-
-        modelBuilder.Entity<QuestionVariant>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("question_variant_pk");
-
-            entity.ToTable("question_variant");
-
-            entity.Property(e => e.Id)
-                .UseIdentityAlwaysColumn()
-                .HasColumnName("id");
-            entity.Property(e => e.IdQuestion).HasColumnName("id_question");
-            entity.Property(e => e.Variant).HasColumnName("variant");
-
-            entity.HasOne(d => d.IdQuestionNavigation).WithMany(p => p.QuestionVariants)
-                .HasForeignKey(d => d.IdQuestion)
-                .HasConstraintName("question_variant_question_fk");
         });
 
         modelBuilder.Entity<RatioOfElementEquality>(entity =>
@@ -286,6 +355,24 @@ public partial class EntranceTestingContext : DbContext
             entity.HasOne(d => d.IdElement2Navigation).WithMany(p => p.RatioOfElementEqualityIdElement2Navigations)
                 .HasForeignKey(d => d.IdElement2)
                 .HasConstraintName("ratio_of_element_equality_element_of_equality_fk_1");
+        });
+
+        modelBuilder.Entity<RootUser>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("rooy_users_pk");
+
+            entity.ToTable("root_users");
+
+            entity.Property(e => e.Id)
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("id");
+            entity.Property(e => e.Login)
+                .HasColumnType("character varying")
+                .HasColumnName("login");
+            entity.Property(e => e.Name)
+                .HasColumnType("character varying")
+                .HasColumnName("name");
+            entity.Property(e => e.Password).HasColumnName("password");
         });
 
         modelBuilder.Entity<TextOfPutting>(entity =>
@@ -317,6 +404,7 @@ public partial class EntranceTestingContext : DbContext
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("id");
             entity.Property(e => e.Correctly).HasColumnName("correctly");
+            entity.Property(e => e.HintApply).HasColumnName("hint_apply");
             entity.Property(e => e.IdQuestion).HasColumnName("id_question");
             entity.Property(e => e.IdSession).HasColumnName("id_session");
 
@@ -362,6 +450,7 @@ public partial class EntranceTestingContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.IdElement).HasColumnName("id_element");
             entity.Property(e => e.IdResponse).HasColumnName("id_response");
+            entity.Property(e => e.Usercorrectly).HasColumnName("usercorrectly");
 
             entity.HasOne(d => d.IdElementNavigation).WithMany(p => p.UserResponseChooseAnswers)
                 .HasForeignKey(d => d.IdElement)
@@ -438,6 +527,7 @@ public partial class EntranceTestingContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.IdElement).HasColumnName("id_element");
             entity.Property(e => e.IdResponse).HasColumnName("id_response");
+            entity.Property(e => e.IdText).HasColumnName("id_text");
 
             entity.HasOne(d => d.IdElementNavigation).WithMany()
                 .HasForeignKey(d => d.IdElement)
@@ -446,6 +536,11 @@ public partial class EntranceTestingContext : DbContext
             entity.HasOne(d => d.IdResponseNavigation).WithMany()
                 .HasForeignKey(d => d.IdResponse)
                 .HasConstraintName("user_response_multiply_answer_user_responses_fk");
+
+            entity.HasOne(d => d.IdTextNavigation).WithMany()
+                .HasForeignKey(d => d.IdText)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("user_response_multiply_answer_text_of_putting_fk");
         });
 
         modelBuilder.Entity<UserSession>(entity =>
@@ -457,9 +552,11 @@ public partial class EntranceTestingContext : DbContext
             entity.Property(e => e.Id)
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("id");
+            entity.Property(e => e.CountHint).HasColumnName("count_hint");
             entity.Property(e => e.Date)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("date");
+            entity.Property(e => e.IdAppSettings).HasColumnName("id_app_settings");
             entity.Property(e => e.Time).HasColumnName("time");
             entity.Property(e => e.UserGroup)
                 .HasColumnType("character varying")
@@ -467,6 +564,11 @@ public partial class EntranceTestingContext : DbContext
             entity.Property(e => e.UserName)
                 .HasColumnType("character varying")
                 .HasColumnName("user_name");
+
+            entity.HasOne(d => d.IdAppSettingsNavigation).WithMany(p => p.UserSessions)
+                .HasForeignKey(d => d.IdAppSettings)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("user_session_app_settings_fk");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EntranseTesting.EditorMatches"
+             x:DataType="vm:MainWindowViewModel"
+             xmlns:vm="using:EntranseTesting.ViewModels">
+  <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+    <StackPanel Orientation="Vertical" Spacing="10">
+      <StackPanel Orientation="Vertical" Spacing="5">
+        <TextBlock Text="Вид соотношения" VerticalAlignment="Center"/>
+        <ComboBox Width="450"
+                  ItemsSource="{Binding EditorPages.TaskEditorPage.MatchCategory}"
+                  SelectedItem="{Binding EditorPages.TaskEditorPage.SelectedMatchCategory}"/>
+      </StackPanel>
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="50" SharedSizeGroup="A"/>
+          <ColumnDefinition Width="350" SharedSizeGroup="B"/>
+          <ColumnDefinition Width="20"/>
+          <ColumnDefinition Width="350" SharedSizeGroup="C"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Vertical" Spacing="5" Grid.Column="1">
+          <TextBlock Text="Группа 1" VerticalAlignment="Center"
+                     HorizontalAlignment="Center" Width="350"/>
+          <TextBox Width="350"
+                   IsVisible="{Binding EditorPages.TaskEditorPage.SelectedGroup}"
+                   Text="{Binding EditorPages.TaskEditorPage.NameMatchesGroup1}"/>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" Spacing="5" Grid.Column="3">
+          <TextBlock Text="Группа 2" VerticalAlignment="Center"
+                     HorizontalAlignment="Center" Width="350"/>
+          <TextBox Width="350"
+                   IsVisible="{Binding EditorPages.TaskEditorPage.SelectedGroup}"
+                   Text="{Binding EditorPages.TaskEditorPage.NameMatchesGroup1}"/>
+        </StackPanel>
+
+        <TextBlock Text="Элементы" VerticalAlignment="Center"
+                   HorizontalAlignment="Center" 
+                   Grid.Row="1" Grid.ColumnSpan="4"
+                   Margin="0 5"/>
+      </Grid>
+      
+      <ItemsRepeater ItemsSource="{Binding EditorPages.TaskEditorPage.MatchesElement}"
+                                 HorizontalAlignment="Stretch"
+                                 VerticalAlignment="Stretch">
+        <ItemsRepeater.Layout>
+          <StackLayout Spacing="5" Orientation="Vertical"/>
+        </ItemsRepeater.Layout>
+        <ItemsRepeater.ItemTemplate>
+          <DataTemplate>
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50" SharedSizeGroup="A"/>
+                <ColumnDefinition Width="350" SharedSizeGroup="B"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="350" SharedSizeGroup="C"/>
+              </Grid.ColumnDefinitions>
+
+              <Button Content="х" Grid.Column="0"
+                      Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.DeleteItem}"
+                      CommandParameter="{Binding}"
+                      IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.NoEditing}"
+                      VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+              <StackPanel Orientation="Vertical" Spacing="5" Grid.Column="1">
+                <TextBox Width="350" Height="80"
+                         Text="{Binding Name1}"/>
+              </StackPanel>
+              <StackPanel Orientation="Vertical" Spacing="5" Grid.Column="3">
+                <TextBox Width="350" Height="80"
+                         Text="{Binding Name2}"/>
+              </StackPanel>
+            </Grid>
+          </DataTemplate>
+        </ItemsRepeater.ItemTemplate>
+      </ItemsRepeater>
+
+      <Button Content="Добавить пару"
+              Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.AddItem}"
+              HorizontalAlignment="Center"/>
+    </StackPanel>
+  </ScrollViewer>
+
+</UserControl>

@@ -6,24 +6,28 @@
              x:Class="EntranseTesting.TestMain"
              x:DataType="vm:MainWindowViewModel"
              xmlns:vm="using:EntranseTesting.ViewModels">
-  <Grid>
-    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-      <ItemsRepeater ItemsSource="{Binding TestMain.Variant}" Margin="15"
-                     VerticalAlignment="Center"
-                     HorizontalAlignment="Center">
-        <ItemsRepeater.Layout>
-          <StackLayout Spacing="10" Orientation="Vertical"/>
-        </ItemsRepeater.Layout>
-        <ItemsRepeater.ItemTemplate>
-          <DataTemplate>
-            <Button Content="{Binding, StringFormat='Вариант {0}'}" 
-                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).StartTesting}" 
-                    CommandParameter="{Binding}"
-                    Width="200" Height="50"
-                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
-          </DataTemplate>
-        </ItemsRepeater.ItemTemplate>
-      </ItemsRepeater>
+   <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+      <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+          <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <TextBlock Text="Группа" 
+                       VerticalAlignment="Center"
+                       Margin="5 0"/>
+            <TextBox Text="{Binding TestMain.GroupUser}"
+                     Width="250"/>
+          </WrapPanel>
+          <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                     Margin="0 7">
+            <TextBlock Text="ФИО"
+                       VerticalAlignment="Center"
+                       Margin="5 0"/>
+            <TextBox Text="{Binding TestMain.NameUser}"
+                     Width="250"/>
+          </WrapPanel>
+          <Button Content="Начать тестирование"
+                  Command="{Binding StartTestingCommand}"
+                  HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Grid>
     </ScrollViewer>
-  </Grid>
 </UserControl>

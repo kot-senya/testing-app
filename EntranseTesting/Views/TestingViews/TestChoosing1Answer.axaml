@@ -11,13 +11,13 @@
     <StackPanel Margin="20 0" Spacing="15" Background="Transparent">
 
       <!-- Задание -->
-      <TextBlock Text="{Binding TestPages.TestC1A.Question}"
+      <TextBlock Text="{Binding TestMain.TestPages.TestC1A.Question}"
                   VerticalAlignment="Top"
                   HorizontalAlignment="Stretch"
                   TextWrapping="Wrap"/>
 
       <!-- Контейнер с элементами выбора -->
-      <ItemsRepeater ItemsSource="{Binding TestPages.TestC1A.Element}" Margin="15"
+      <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.TestC1A.Element}" Margin="15"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Stretch">
         <ItemsRepeater.Layout>
@@ -26,7 +26,7 @@
         <ItemsRepeater.ItemTemplate>
           <DataTemplate>
             <RadioButton Content="{Binding Name}"
-                         IsChecked="{Binding Correctly, Mode=OneWayToSource}"
+                         IsChecked="{Binding UserCorrectly}"
                          TextBlock.TextWrapping="Wrap"/>
           </DataTemplate>
         </ItemsRepeater.ItemTemplate>

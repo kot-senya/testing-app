@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EntranseTesting.TaskMain"
+             x:DataType="vm:MainWindowViewModel"
+             xmlns:vm="using:EntranseTesting.ViewModels">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <Grid Margin="15 10"
+          RowDefinitions="Auto,*">
+      <WrapPanel Orientation="Horizontal">
+        <!-- // Поиск //-->
+        <StackPanel Orientation="Vertical" Margin="5">
+          <TextBlock Text="Искать по вопросу"
+                     VerticalAlignment="Center"/>
+          <TextBox Text="{Binding EditorPages.TaskMainPage.SearchLine}"
+                   TextBlock.TextWrapping="NoWrap"
+                   Width="250"/>
+        </StackPanel>
+        <!-- // Фильтрация //-->
+        <StackPanel Orientation="Vertical" Margin="5">
+          <TextBlock Text="Фильтровать по типу задания"
+                     VerticalAlignment="Center"/>
+          <ComboBox ItemsSource="{Binding EditorPages.TaskMainPage.CategoryList}"
+                    SelectedItem="{Binding EditorPages.TaskMainPage.SelectedCategory}"
+                    TextBlock.TextWrapping="NoWrap"
+                    TextBlock.TextTrimming="WordEllipsis"
+                    Width="250"/>
+        </StackPanel>
+        <!-- // Те которые включаются в тест //-->
+        <CheckBox Content="Вопросы, включаемые в тест"
+                  VerticalAlignment="Bottom"
+                  Width="300" Margin="5"
+                  IsChecked="{Binding  EditorPages.TaskMainPage.SelectedInTest}"/>
+        <!-- // Кнопка Добавления вопроса //-->
+        <Button Command="{Binding AddQuestion}"
+                VerticalAlignment="Bottom"  Margin="5"
+                Content="Добавить вопрос"/>
+      </WrapPanel>
+
+      <ItemsRepeater Grid.Row="1" ItemsSource="{Binding EditorPages.TaskMainPage.Questions}"
+                     VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <ItemsRepeater.Layout>
+          <StackLayout Spacing="10" Orientation="Vertical"/>
+        </ItemsRepeater.Layout>
+        <ItemsRepeater.ItemTemplate>
+          <DataTemplate>
+            <Border BorderBrush="LightCoral" BorderThickness="0 0 0 2"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                    Margin="10 2">
+              <StackPanel Orientation="Vertical">
+                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                  <Button HorizontalAlignment="Right" Classes="icon"
+                          Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditQuestion}" CommandParameter="{Binding Id}"
+                          Tag="{StaticResource DraftsRegular}"
+                          Content="Редактировать"/>
+                </WrapPanel>
+                <!-- Задание -->
+                <ContentControl Content="{Binding tName}"
+                                HorizontalAlignment="Stretch"/>
+                <!-- Ответ -->
+                <ContentControl Content="{Binding Answer}"
+                           HorizontalAlignment="Stretch"/>
+                <Button Content="Удалить вопрос" Margin="5"
+                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskMainPage.DeleteQuestion}" 
+                        CommandParameter="{Binding Id}"
+                        HorizontalAlignment="Right"
+                        IsVisible="{Binding IsVisibleDelete}"/>
+              </StackPanel>
+            </Border>
+
+          </DataTemplate>
+        </ItemsRepeater.ItemTemplate>
+      </ItemsRepeater>
+    </Grid>
+  </ScrollViewer>
+</UserControl>

@@ -8,19 +8,22 @@ using Avalonia;
 using System.Linq;
 using EntranseTesting.Models;
 using System.Runtime.InteropServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace EntranseTesting.ViewModels
 {
-    public class TestArrangementOfElementsViewModel : ReactiveObject
+    public partial class TestArrangementOfElementsViewModel : ObservableObject
     {
         EntranceTestingContext baseConnection = new EntranceTestingContext();
 
         public const string CustomFormat = "element-item-format";
-        int numberTask;
-        string question;
-        Orientation stackLayoutOrientation;
+        [ObservableProperty] int numberTask;
+        [ObservableProperty] string question;
+        [ObservableProperty] Orientation stackLayoutOrientation;
+        [ObservableProperty] private ElementOfArrangement? draggingElementItem;
         ObservableCollection<ElementOfArrangement> element = new ObservableCollection<ElementOfArrangement>();
-        private ElementOfArrangement? draggingElementItem;
+
+        public ObservableCollection<ElementOfArrangement> Element { get => element; set => element = value; }
 
         public TestArrangementOfElementsViewModel(int numberTask, Orientation orientation)
         {
@@ -29,18 +32,32 @@ namespace EntranseTesting.ViewModels
             Question = baseConnection.Questions.FirstOrDefault(tb => tb.Id == numberTask).Name;
             StackLayoutOrientation = orientation;
 
-            List<ElementOfArrangement> _list = baseConnection.ElementOfArrangements.Where(tb => tb.IdQuestion == numberTask).ToList();
-            Random.Shared.Shuffle(CollectionsMarshal.AsSpan(_list));
-            foreach (ElementOfArrangement elem in _list)
-                Element.Add(elem);
-
+            int responseIndex = Response.IndexResponse(numberTask);
+            if (Response.responseUsers[responseIndex].UserResponseArrangements.Count == 0)//если пользователь не отвечал
+            {
+                //заполняем данные
+                List<ElementOfArrangement> _list = baseConnection.ElementOfArrangements.Where(tb => tb.IdQuestion == numberTask).ToList();
+                Random.Shared.Shuffle(CollectionsMarshal.AsSpan(_list));
+                foreach (ElementOfArrangement elem in _list)
+                    Element.Add(elem);
+                int i = 1;
+                //записываем в шаблон ответа            
+                foreach (ElementOfArrangement elem in _list)
+                    Response.responseUsers[responseIndex].UserResponseArrangements.Add(new UserResponseArrangement { IdElement = elem.Id, Position = i++ });
+            }
+            else//если пользователь отвечал
+            {
+                //заполняем данные
+                List<ElementOfArrangement> _list = baseConnection.ElementOfArrangements.Where(tb => tb.IdQuestion == numberTask).ToList();
+                List<UserResponseArrangement> _response = Response.responseUsers[responseIndex].UserResponseArrangements.ToList();
+                _response = _response.OrderBy(tb => tb.Position).ToList();
+                foreach (UserResponseArrangement item in _response)
+                {
+                    ElementOfArrangement elem = _list.FirstOrDefault(tb => tb.Id == item.IdElement);
+                    Element.Add(elem);
+                }
+            }
         }
-
-        public string Question { get => question; set => this.RaiseAndSetIfChanged(ref question, value); }
-        public Orientation StackLayoutOrientation { get => stackLayoutOrientation; set => this.RaiseAndSetIfChanged(ref stackLayoutOrientation, value); }
-        public ObservableCollection<ElementOfArrangement> Element { get => element; set => this.RaiseAndSetIfChanged(ref element, value); }
-        public ElementOfArrangement? DraggingElementItem { get => draggingElementItem; set => this.RaiseAndSetIfChanged(ref draggingElementItem, value); }
-
 
         public void StartDrag(ElementOfArrangement elem)
         {
@@ -60,9 +77,9 @@ namespace EntranseTesting.ViewModels
             int difference = 0;
 
             if (StackLayoutOrientation == Orientation.Horizontal)
-                difference = (int)Math.Round((endPosition.X - startPosition.X + 20) / 150);
+                difference = (int)Math.Round((endPosition.X - startPosition.X + 10) / DraggingElementItem.Width);
             else if (StackLayoutOrientation == Orientation.Vertical)
-                difference = (int)Math.Round((endPosition.Y - startPosition.Y + 10) / 50);
+                difference = (int)Math.Round((endPosition.Y - startPosition.Y + 10) / DraggingElementItem.Height);
 
             if (difference != 0)
             {
@@ -70,7 +87,7 @@ namespace EntranseTesting.ViewModels
                 difference = (difference + indexItem < 0) ? 0 : (difference + indexItem > Element.Count) ? Element.Count : difference + indexItem;
                 Element.Insert(difference, item);
             }
-
         }
+   
     }
 }

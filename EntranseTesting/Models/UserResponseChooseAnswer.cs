@@ -11,6 +11,8 @@ public partial class UserResponseChooseAnswer
 
     public int IdElement { get; set; }
 
+    public bool? Usercorrectly { get; set; }
+
     public virtual ElementOfChoose IdElementNavigation { get; set; } = null!;
 
     public virtual UserResponse IdResponseNavigation { get; set; } = null!;

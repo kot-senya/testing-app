@@ -1,21 +1,211 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:EntranseTesting.ViewModels"
+        xmlns:conv="clr-namespace:EntranseTesting.Converter;assembly=EntranseTesting"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
         MinWidth="500" MinHeight="500"
         x:Class="EntranseTesting.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="EntranseTesting">
+        Icon="/Assets/icon.ico"
+        Title="Входное тестирование">
 
-    <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+    <vm:MainWindowViewModel/>
+  </Design.DataContext>
+  <Window.Resources>
+    <conv:SizeConverter x:Key="SizeConverter"/>
+    <conv:ItemArrangementOfElements x:Key="ItemArrangementOfElements"/>
+    <x:Decimal x:Key="HeaderParameter">1.5</x:Decimal>
+    <x:Decimal x:Key="Header2Parameter">1.3</x:Decimal>
+    <x:Decimal x:Key="SmallParameter">0.8</x:Decimal>
+    <x:Decimal x:Key="ArrangmentParameter">190.0</x:Decimal>
+  </Window.Resources>
+  <Window.Styles>
+    <Style Selector=":is(TopLevel)">
+      <Setter Property="FontFamily" Value="{Binding #MyFont.SelectedValue}"/>
+      <Setter Property="FontSize" Value="{Binding #MyFontSize.Value}"/>
+      <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style Selector=":is(TextBlock)">
+      <Setter Property="FontFamily" Value="{Binding #MyFont.SelectedValue}"/>
+      <Setter Property="FontSize" Value="{Binding #MyFontSize.Value}"/>
+      <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style Selector=":is(TextBox)">
+      <Setter Property="FontFamily" Value="{Binding #MyFont.SelectedValue}"/>
+      <Setter Property="FontSize" Value="{Binding #MyFontSize.Value}"/>
+      <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style Selector=":is(NumericUpDown)">
+      <Setter Property="FontFamily" Value="{Binding #MyFont.SelectedValue}"/>
+      <Setter Property="FontSize" Value="{Binding #MyFontSize.Value}"/>
+      <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style Selector=":is(TimePicker)">
+      <Setter Property="FontFamily" Value="{Binding #MyFont.SelectedValue}"/>
+      <Setter Property="FontSize" Value="{Binding #MyFontSize.Value}"/>
+      <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style Selector=":is(Button)">
+      <Setter Property="FontFamily" Value="{Binding #MyFont.SelectedValue}"/>
+      <Setter Property="FontSize" Value="{Binding #MyFontSize.Value}"/>
+      <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+    </Style>
 
-  <ContentControl Content="{Binding UC}"/>
+    <Style Selector=":is(TextBlock).Header">
+      <Setter Property="FontSize" Value="{Binding #MyFontSize.Value, Converter={StaticResource SizeConverter}, ConverterParameter={StaticResource HeaderParameter}}"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="Margin" Value="5 10 5 15"/>
+    </Style>
+    <Style Selector=":is(TextBlock).Header2">
+      <Setter Property="FontSize" Value="{Binding #MyFontSize.Value, Converter={StaticResource SizeConverter}, ConverterParameter={StaticResource Header2Parameter}}"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+    </Style>
+    <Style Selector=":is(TextBlock).Small">
+      <Setter Property="FontSize" Value="{Binding #MyFontSize.Value, Converter={StaticResource SizeConverter}, ConverterParameter={StaticResource SmallParameter}}"/>
+      <Setter Property="Margin" Value="5"/>
+      <Setter Property="Opacity" Value="0.9"/>
+    </Style>
+    <Style Selector=":is(Border).Arrangment">
+      <Setter Property="Width" Value="{Binding #MyFontSize.Value, Converter={StaticResource ItemArrangementOfElements}, ConverterParameter={StaticResource ArrangmentParameter}}"/>
+    </Style>
+    
+    <Style Selector=":is(Button).icon">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{StaticResource ControlCornerRadius}"
+                  Padding="{TemplateBinding Padding}">
+            <DockPanel>
+              <PathIcon Foreground="{TemplateBinding Foreground}"
+                        Data="{TemplateBinding Tag}"
+                        DockPanel.Dock="Left" />
+              <ContentPresenter Content="{TemplateBinding Content}"
+                                IsVisible="{Binding IsPaneOpen}"
+                                Margin="10,0,10,0"
+                                TextBlock.Foreground="{TemplateBinding Foreground}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </DockPanel>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector=":is(Button).icon:pointerover">
+      <Setter Property="Opacity" Value="0.35"/>
+    </Style>
+    <Style Selector=":is(Button).icon:pressed">
+      <Setter Property="Opacity" Value="0.65"/>
+    </Style>
+    <Style Selector=":is(Button).menu">
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="10,0"
+                  Padding="{TemplateBinding Padding}">
+            <DockPanel>
+              <PathIcon Foreground="{TemplateBinding Foreground}"
+                        Data="{TemplateBinding Tag}"
+                        DockPanel.Dock="Left"/>
+              <ContentPresenter Content="{TemplateBinding Content}"
+                                Margin="10,0,10,0"
+                                TextBlock.Foreground="{TemplateBinding Foreground}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </DockPanel>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector=":is(Button):disabled">
+      <Setter Property="Background" Value="#696BFF"/>
+    </Style>
+  </Window.Styles>
 
+  <SplitView IsPaneOpen="{Binding IsPaneOpen}"
+             CompactPaneLength="48"
+             OpenPaneLength="300"
+             DisplayMode="CompactInline">
+    <SplitView.Pane>
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                    VerticalScrollBarVisibility="Auto">
+        <Grid>
+          <StackPanel Spacing="5" Margin="5"
+                      VerticalAlignment="Top">
+            <Button Command="{Binding IsClickPainCommand}" Classes="icon"                    
+                    Tag="{StaticResource LineHorizontal3Regular}"
+                    Background="Transparent"/>
+            
+            <!-- // Кнопка Авторизация //-->
+            <Button Command="{Binding AuthorizationCommand}" Classes="icon"
+                    IsVisible="{Binding IsAuth}" HorizontalAlignment="Stretch"
+                    Tag="{StaticResource PersonRegular}" Content="Авторизироваться"
+                    Background="Transparent"/>
+              
+            <!-- // Кнопка Изменения текста //-->
+            <Button Command="{Binding IsTextClickCommand}" Classes="icon"
+                    HorizontalAlignment="Stretch" 
+                    Tag="{StaticResource TextFieldRegular}" Content="Отображение текста"
+                    Background="Transparent"/>
+            
+            <!-- // Параметры Изменения текста //-->
+            <WrapPanel IsVisible="{Binding TextChangeVisible}" Margin="10 0">
+              <TextBlock Text="Шрифт"/>
+              <ComboBox Name="MyFont"
+                        ItemsSource="{Binding IS.Fonts}" SelectedItem="{Binding IS.SelectedFont}"
+                        AutoScrollToSelectedItem="True"
+                        IsTextSearchEnabled="True"
+                        Width="200"/>
+            </WrapPanel>
+            <WrapPanel IsVisible="{Binding TextChangeVisible}" Margin="10 0">
+              <TextBlock Text="Размер шрифта"/>
+              <NumericUpDown Name="MyFontSize"
+                             Value="{Binding IS.MyFontSize}"
+                             Minimum="8" Maximum="30"
+                             Increment="2"
+                             MinWidth="100"
+                             ButtonSpinnerLocation="Left"/>
+            </WrapPanel>
+            
+            <!-- // Кнопка Инфо Подсказки //-->
+            <Button Command="{Binding IsHintClickCommand}" Classes="icon"
+                    IsVisible="{Binding Info}" HorizontalAlignment="Stretch"
+                    Tag="{StaticResource LightbulbCircleRegular}" Content="Система подсказок"
+                    Background="Transparent"/>
+            
+            <!-- // Текст Инфо Подсказки //-->
+            <TextBlock Text="{Binding Mess.InfoHint}"
+                       IsVisible="{Binding HintVisible}"
+                       Margin="10 0"/>
+
+            <!-- // Кнопка Добавления вопроса //-->
+            <Button Command="{Binding AddQuestion}" Classes="icon"
+                   IsVisible="{Binding EditorPages.AddQuestionVisible}" HorizontalAlignment="Stretch"
+                   Tag="{StaticResource AddSquareRegular}" Content="Добавить вопрос"
+                   Background="Transparent"/>
+          </StackPanel>
+          
+          <!-- // Кнопка выхода //-->
+          <Button Command="{Binding ToBackCommand}" Margin="5"
+                  IsVisible="{Binding IsExit}" Classes="icon"
+                  VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                  Tag="{StaticResource SignOutRegular}" Content="Выйти"
+                  Background="Transparent"/>
+        </Grid>
+      </ScrollViewer>
+    </SplitView.Pane>
+    <SplitView.Content>
+      <ContentControl Content="{Binding UC}"/>
+    </SplitView.Content>
+  </SplitView>
 </Window>

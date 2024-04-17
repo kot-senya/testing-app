@@ -3,14 +3,19 @@
              x:Class="EntranseTesting.App"
              xmlns:local="using:EntranseTesting"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+  <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
-    <Application.DataTemplates>
-        <local:ViewLocator/>
-    </Application.DataTemplates>
-  
-    <Application.Styles>
-      <FluentTheme>       
-      </FluentTheme>
-    </Application.Styles>
+  <Application.DataTemplates>
+    <local:ViewLocator/>
+  </Application.DataTemplates>
+
+  <Application.Styles>
+    <FluentTheme>
+      <FluentTheme.Palettes>
+        <ColorPaletteResources x:Key="Light" Accent="#ff6274cc" AltHigh="White" AltLow="White" AltMedium="White" AltMediumHigh="White" AltMediumLow="White" BaseHigh="Black" BaseLow="#ffcfd7ff" BaseMedium="#ff8292c1" BaseMediumHigh="#ff4f6497" BaseMediumLow="#ff697bac" ChromeAltLow="#ff4f6497" ChromeBlackHigh="Black" ChromeBlackLow="#ffcfd7ff" ChromeBlackMedium="#ff4f6497" ChromeBlackMediumLow="#ff8292c1" ChromeDisabledHigh="#ffcfd7ff" ChromeDisabledLow="#ff8292c1" ChromeGray="#ff697bac" ChromeHigh="#ffcfd7ff" ChromeLow="#ffeaf0ff" ChromeMedium="#ffe5ebff" ChromeMediumLow="#ffeaf0ff" ChromeWhite="White" ListLow="#ffe5ebff" ListMedium="#ffcfd7ff" RegionColor="#fffef6ff" />
+        <ColorPaletteResources x:Key="Dark" Accent="#ff6274cc" AltHigh="Black" AltLow="Black" AltMedium="Black" AltMediumHigh="Black" AltMediumLow="Black" BaseHigh="White" BaseLow="#ff64576b" BaseMedium="#ffb6aabc" BaseMediumHigh="#ffcbbfd0" BaseMediumLow="#ff8d8193" ChromeAltLow="#ffcbbfd0" ChromeBlackHigh="Black" ChromeBlackLow="#ffcbbfd0" ChromeBlackMedium="Black" ChromeBlackMediumLow="Black" ChromeDisabledHigh="#ff64576b" ChromeDisabledLow="#ffb6aabc" ChromeGray="#ffa295a8" ChromeHigh="#ffa295a8" ChromeLow="#ff332041" ChromeMedium="#ff3f2e4b" ChromeMediumLow="#ff584960" ChromeWhite="White" ListLow="#ff3f2e4b" ListMedium="#ff64576b" RegionColor="#ff262738" />
+      </FluentTheme.Palettes>
+    </FluentTheme>
+    <StyleInclude Source="avares://EntranseTesting/Assets/Icons.axaml"/>
+  </Application.Styles>
 </Application>

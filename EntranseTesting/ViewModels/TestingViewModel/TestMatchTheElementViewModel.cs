@@ -15,20 +15,29 @@ using CommunityToolkit.Mvvm.Input;
 using Avalonia;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
+using DynamicData;
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel;
 
 namespace EntranseTesting.ViewModels
 {
-    public class TestMatchTheElementViewModel : ReactiveObject
+    public partial class TestMatchTheElementViewModel : ObservableObject, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         EntranceTestingContext baseConnection = new EntranceTestingContext();
 
-        int numberTask;
-        string question;
-        string nameGroup1;
-        string nameGroup2;
+        [ObservableProperty]int numberTask;
+        [ObservableProperty] string question;
+        [ObservableProperty] string nameGroup1;
+        [ObservableProperty] string nameGroup2;
         ObservableCollection<ElementOfGroup> elementMatchGroup1 = new ObservableCollection<ElementOfGroup>();
         ObservableCollection<ElementOfGroup> elementMatchGroup2 = new ObservableCollection<ElementOfGroup>();
-        ObservableCollection<ItemLine> lines = new ObservableCollection<ItemLine>();
+        [ObservableProperty] List<ItemMatch> matches = new List<ItemMatch>();
 
         public TestMatchTheElementViewModel(int numberTask)
         {
@@ -51,57 +60,93 @@ namespace EntranseTesting.ViewModels
                 ElementMatchGroup2.Add(elem);
         }
 
-        public string Question { get => question; set => question = value; }
-        public string NameGroup1 { get => nameGroup1; set => nameGroup1 = value; }
-        public string NameGroup2 { get => nameGroup2; set => nameGroup2 = value; }
-        public ObservableCollection<ElementOfGroup> ElementMatchGroup1 { get => elementMatchGroup1; set => elementMatchGroup1 = value; }
-        public ObservableCollection<ElementOfGroup> ElementMatchGroup2 { get => elementMatchGroup2; set => elementMatchGroup2 = value; }
-        public ObservableCollection<ItemLine> Lines { get => lines; set => this.RaiseAndSetIfChanged(ref lines, value); }
+        public ObservableCollection<ElementOfGroup> ElementMatchGroup1 { get => elementMatchGroup1; set { elementMatchGroup1 = value; OnPropertyChanged(); } }
+        public ObservableCollection<ElementOfGroup> ElementMatchGroup2 { get => elementMatchGroup2; set { elementMatchGroup2 = value; OnPropertyChanged(); } }
 
         public void MatchLine(ElementOfGroup elem, ref Border border)
         {
-            /*
-            ItemLine item = Lines.FirstOrDefault(tb => tb.Elem1 == null || tb.Elem2 == null);
+            ItemMatch item = Matches.FirstOrDefault(tb => tb.Elem1 == null || tb.Elem2 == null);
 
             if (item == null)
-                item = new ItemLine();
+                item = new ItemMatch();
             else
-                Lines.Remove(item);
+                Matches.Remove(item);
 
             ElementOfGroup elem1 = ElementMatchGroup1.FirstOrDefault(tb => tb.Id == elem.Id);
             ElementOfGroup elem2 = ElementMatchGroup2.FirstOrDefault(tb => tb.Id == elem.Id);
-            
-            item.Border = border;
 
-            if(elem1 != null && item.Elem1 == null)
+            Matches.RemoveMany(matches.Where(tb => tb.Elem1 == elem1 || tb.Elem2 == elem2).ToList());
+
+            item.NumGroup = numMatch();
+
+            nullableValue();
+
+            if (elem1 != null && item.Elem1 == null)
             {
                 item.Elem1 = elem1;
-                TextBlock tb = (TextBlock)border.Child;
-                int x = Convert.ToInt32(tb.Bounds.Top - tb.Bounds.Height / 2);
-                int y = Convert.ToInt32(tb.Bounds.Left);
-                item.StartPoint = new(x, y);
-
-                if(item.Elem2 == null)
-                    item.EndPoint = new(x, y);
             }
             else if (elem2 != null && item.Elem2 == null)
             {
                 item.Elem2 = elem2;
-                TextBlock tb = (TextBlock)border.Child;
-                int x = Convert.ToInt32(tb.Bounds.Top - tb.Bounds.Height / 2);
-                int y = Convert.ToInt32(tb.Bounds.Right);
-                item.EndPoint = new(x, y);
-
-                if (item.Elem1 == null)
-                    item.StartPoint = new(x, y);
             }
             else
             {
                 Debug.WriteLine($"Elem with id '{elem.Id}' not found");
                 return;
             }
+            
+            Matches.Add(item);
+            if (item.Elem1 != null)
+            {
+                int i = ElementMatchGroup1.IndexOf(item.Elem1);
+                ElementMatchGroup1[i].IsActive = true;
+                ElementMatchGroup1[i].NumGroup = item.NumGroup;
+            }
+            if (item.Elem2 != null) 
+            { 
+                int i = ElementMatchGroup2.IndexOf(item.Elem2);
+                ElementMatchGroup2[i].IsActive = true;
+                ElementMatchGroup2[i].NumGroup = item.NumGroup;
+            }    
+           
+        }
+        
+        private int numMatch() 
+        {
+            int value = -1;
 
-            Lines.Add(item);*/
+            if (Matches.Count == 0)
+                return 1;
+
+            for(int i = 1; i <= ElementMatchGroup1.Count; i++)
+            {
+                if(Matches.Where(tb => tb.NumGroup == i).Count() == 0)
+                    return i;
+            }
+            return value;
+        }
+        private void nullableValue()
+        {
+            foreach(ElementOfGroup e in ElementMatchGroup1)
+            {
+                if(Matches.Where(tb => tb.Elem1 == e).Count() == 0)
+                {
+                    int i = ElementMatchGroup1.IndexOf(e);
+                    ElementMatchGroup1[i].IsActive = false;
+                    if (Matches.Where(tb=>tb.Elem1 == e).Count() == 0)
+                        ElementMatchGroup1[i].NumGroup = 0;
+                }
+            }
+            foreach (ElementOfGroup e in ElementMatchGroup2)
+            {
+                if (Matches.Where(tb => tb.Elem2 == e).Count() == 0)
+                {
+                    int i = ElementMatchGroup2.IndexOf(e);
+                    ElementMatchGroup2[i].IsActive = false;
+                    if (Matches.Where(tb => tb.Elem2 == e).Count() == 0)
+                        ElementMatchGroup2[i].NumGroup = 0;
+                }
+            }
         }
     }
 }

@@ -1,0 +1,130 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EntranseTesting.TestSettings"
+             x:DataType="vm:MainWindowViewModel"
+             xmlns:vm="using:EntranseTesting.ViewModels">
+  <ScrollViewer>
+    <StackPanel Margin="15 10" Spacing="10">
+      <TextBlock Text="{Binding Mess.WarningSettingsApp}"
+                 Classes="Small"
+                 TextWrapping="Wrap"/>
+
+      <WrapPanel Orientation="Horizontal"
+                 HorizontalAlignment="Center" VerticalAlignment="Stretch">
+        <Border Margin="10 2"
+                HorizontalAlignment="Center">
+          <StackPanel Spacing="5" Orientation="Vertical">
+
+            <TextBlock Text="Настройки Теста"
+                       Classes="Header"
+                       HorizontalAlignment="Center"/>
+
+            <WrapPanel Orientation="Horizontal">
+              <TextBlock Text="Количество вопросов"
+                         VerticalAlignment="Center"
+                         Margin="5 0"/>
+              <NumericUpDown Value="{Binding EditorPages.SettingsApp.Settings.CountOfQuestions}"
+                             Minimum="0" Maximum="{Binding EditorPages.SettingsApp.CountQuestion}"
+                             Margin="5 0"/>
+            </WrapPanel>
+
+            <WrapPanel Orientation="Horizontal">
+              <TextBlock Text="Время прохождения"
+                         VerticalAlignment="Center"
+                         Margin="5 0"/>
+              <TimePicker SelectedTime="{Binding EditorPages.SettingsApp.Settings.Time}"
+                          MinuteIncrement="5"
+                          Margin="5 0"/>
+            </WrapPanel>
+
+            <CheckBox Name="HintVisibility"
+                      Content="Включить подсказки в тест"
+                      ToolTip.Tip="{Binding Mess.ToolTipHintCount}" ToolTip.Placement="Right"
+                      IsChecked="{Binding EditorPages.SettingsApp.Settings.HintVisibility}"
+                      Margin="5 0"/>
+
+            <WrapPanel Orientation="Horizontal"
+                        IsVisible="{Binding #HintVisibility.IsChecked}">
+              <TextBlock Text="Количество подсказок*"
+                         VerticalAlignment="Center"
+                         ToolTip.Tip="{Binding Mess.ToolTipHintCount}" ToolTip.Placement="Right"
+                         Margin="5 0"/>
+              <NumericUpDown Name="nCountOfHints"
+                             Value="{Binding EditorPages.SettingsApp.Settings.CountOfHints}"
+                             Minimum="0" Maximum="1000"
+                             Margin="5 0"/>
+            </WrapPanel>
+
+            <CheckBox Name="HalfVisibility"
+                      Content="Включить 50/50 в тест"
+                      Margin="5 0"
+                      IsChecked="{Binding EditorPages.SettingsApp.Settings.HalfVisibility}"
+                      IsVisible="{Binding #HintVisibility.IsChecked}"
+                      ToolTip.Tip="{Binding Mess.ToolTipHalfCost}" ToolTip.Placement="Right"/>
+
+            <WrapPanel Orientation="Horizontal"
+                        IsVisible="{Binding #HalfVisibility.IsChecked}">
+              <TextBlock Text="Количество очков за 50/50*"
+                         ToolTip.Tip="{Binding Mess.ToolTipHalfCost}" ToolTip.Placement="Right"
+                         VerticalAlignment="Center"
+                         Margin="5 0"/>
+              <NumericUpDown Value="{Binding EditorPages.SettingsApp.Settings.HalfCost}"
+                             Minimum="0" Maximum="{Binding Value, ElementName=nCountOfHints}"/>
+            </WrapPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Margin="10 2"
+                HorizontalAlignment="Center">
+          <StackPanel Spacing="5" Orientation="Vertical">
+
+            <TextBlock Text="Настройки Оценивания теста"
+                       Classes="Header"
+                       HorizontalAlignment="Center"/>
+            
+            <TextBlock Text="{Binding Mess.AboutEvaluationTest}"
+                       Classes="Small"
+                       TextWrapping="Wrap"/>
+
+            <WrapPanel Orientation="Horizontal">
+              <TextBlock Text="Оценка 5"
+                         VerticalAlignment="Center"
+                         Margin="5 0"/>
+              <NumericUpDown Name="Raiting5"
+                             Value="{Binding EditorPages.SettingsApp.Settings.Raiting5}"
+                             Minimum="0" Maximum="{Binding EditorPages.SettingsApp.CountQuestion}"
+                             Margin="5 0"/>
+            </WrapPanel>
+
+            <WrapPanel Orientation="Horizontal">
+              <TextBlock Text="Оценка 4"
+                         VerticalAlignment="Center"
+                         Margin="5 0"/>
+              <NumericUpDown Name="Raiting4"
+                             Value="{Binding EditorPages.SettingsApp.Settings.Raiting4}"
+                             Minimum="0" Maximum="{Binding #Raiting5.Value}"
+                             Margin="5 0"/>
+            </WrapPanel>
+
+            <WrapPanel Orientation="Horizontal">
+              <TextBlock Text="Оценка 3"
+                         VerticalAlignment="Center"
+                         Margin="5 0"/>
+              <NumericUpDown Value="{Binding EditorPages.SettingsApp.Settings.Raiting3}"
+                             Minimum="0" Maximum="{Binding #Raiting4.Value}"
+                             Margin="5 0"/>
+            </WrapPanel>
+
+          </StackPanel>
+        </Border>
+      </WrapPanel>
+
+      <Button Content="Сохранить"
+              Command="{Binding EditorPages.SaveSettingsCommand}"
+              HorizontalAlignment="Center"/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

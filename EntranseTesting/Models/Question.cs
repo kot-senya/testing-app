@@ -13,6 +13,8 @@ public partial class Question
 
     public double Price { get; set; }
 
+    public bool? InTest { get; set; }
+
     public virtual ICollection<ElementOfArrangement> ElementOfArrangements { get; set; } = new List<ElementOfArrangement>();
 
     public virtual ICollection<ElementOfChoose> ElementOfChooses { get; set; } = new List<ElementOfChoose>();
@@ -23,9 +25,9 @@ public partial class Question
 
     public virtual Category IdCategoryNavigation { get; set; } = null!;
 
-    public virtual ICollection<QuestionImage> QuestionImages { get; set; } = new List<QuestionImage>();
+    public virtual ICollection<QuestionHint> QuestionHints { get; set; } = new List<QuestionHint>();
 
-    public virtual ICollection<QuestionVariant> QuestionVariants { get; set; } = new List<QuestionVariant>();
+    public virtual ICollection<QuestionImage> QuestionImages { get; set; } = new List<QuestionImage>();
 
     public virtual ICollection<TextOfPutting> TextOfPuttings { get; set; } = new List<TextOfPutting>();
 

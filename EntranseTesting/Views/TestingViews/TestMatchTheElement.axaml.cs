@@ -23,6 +23,6 @@ public partial class TestMatchTheElement : UserControl
         if (border.DataContext is not ElementOfGroup elem) return;
 
         if (DataContext is not MainWindowViewModel vm) return;
-        vm.TestPages.TestME.MatchLine(elem, ref border);
+        vm.TestMain.TestPages.TestME.MatchLine(elem, ref border);
     }
 }

@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EntranseTesting.TestMatchTheValue"             
+             x:DataType="vm:MainWindowViewModel"
+             xmlns:vm="using:EntranseTesting.ViewModels">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="20 0" Spacing="15" Background="Transparent">
+
+      <!-- Задание -->
+      <TextBlock  Text="{Binding TestMain.TestPages.TestMV.Question}"
+                  VerticalAlignment="Top"
+                  HorizontalAlignment="Stretch"
+                  TextWrapping="Wrap"/>
+
+      <!--// Элементы соотношения //-->
+      <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.TestMV.Elements}" Margin="15"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center">
+        <ItemsRepeater.Layout>
+          <StackLayout Spacing="10" Orientation="Vertical"/>
+        </ItemsRepeater.Layout>
+        <ItemsRepeater.ItemTemplate>
+          <DataTemplate>
+            <Grid ColumnDefinitions="*,Auto,*">
+              <ComboBox ItemsSource="{Binding Values}" SelectedItem="{Binding Elem1}"
+                        Grid.Column="0"
+                        HorizontalAlignment="Right"
+                        TextBlock.TextWrapping="Wrap"
+                        Margin="10 5"/>
+              <TextBlock Text="="
+                         Grid.Column="1"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center"
+                         Margin="20 5"/>
+              <ComboBox ItemsSource="{Binding Values}" SelectedItem="{Binding Elem2}"
+                        Grid.Column="2"
+                        HorizontalAlignment="Left"
+                        TextBlock.TextWrapping="Wrap"
+                        Margin="10 5"/>
+            </Grid>
+          </DataTemplate>
+        </ItemsRepeater.ItemTemplate>
+      </ItemsRepeater>
+    </StackPanel>
+  </ScrollViewer>
+
+</UserControl>

@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EntranseTesting.EditorArrangement"
+             x:DataType="vm:MainWindowViewModel"
+             xmlns:vm="using:EntranseTesting.ViewModels">
+  <StackPanel Orientation="Vertical" Spacing="10">
+    <StackPanel Orientation="Vertical" Spacing="5">
+      <TextBlock Text="Положение элементов" VerticalAlignment="Center"/>
+      <ComboBox Width="450"
+                ItemsSource="{Binding EditorPages.TaskEditorPage.ArrangmentCategory}"
+                SelectedItem="{Binding EditorPages.TaskEditorPage.SelectedArrangmentCategory}"/>
+    </StackPanel>
+
+    <ItemsRepeater ItemsSource="{Binding EditorPages.TaskEditorPage.ArrangementElement}"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch">
+      <ItemsRepeater.Layout>
+        <StackLayout Spacing="5" Orientation="Vertical"/>
+      </ItemsRepeater.Layout>
+      <ItemsRepeater.ItemTemplate>
+        <DataTemplate>
+          <WrapPanel Orientation="Horizontal">           
+            <Button Content="х"
+                    Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.DeleteItem}"
+                    CommandParameter="{Binding}"
+                    IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.NoEditing}"
+                    VerticalAlignment="Center" />
+            <NumericUpDown Value="{Binding Position}" Margin="10 0"
+                           MinWidth="150" Minimum="1" 
+                           Maximum="{Binding $parent[ItemsRepeater].Children.Count}"/>
+            <TextBox Text="{Binding Name}"
+                     Width="300" Height="80"/>
+          </WrapPanel>
+        </DataTemplate>
+      </ItemsRepeater.ItemTemplate>
+    </ItemsRepeater>
+
+    <Button Content="Добавить вариант ответа"
+            Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.AddItem}"
+            HorizontalAlignment="Center"/>
+  </StackPanel>
+</UserControl>

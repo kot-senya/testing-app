@@ -12,7 +12,6 @@ namespace EntranseTesting;
 
 public partial class TestArrangementOfElements : UserControl
 {
-
     private Point _ghostPosition = new(0, 0);
     private readonly Point _mouseOffset = new(-5, -5);
     private Point _startItemPosition = new(0, 0);
@@ -45,9 +44,11 @@ public partial class TestArrangementOfElements : UserControl
         GhostItem.RenderTransform = new TranslateTransform(offsetX, offsetY);
 
         _startItemPosition = new Point(offsetX, offsetY);
+        elem.Width = border.Bounds.Width;
+        elem.Height = border.Bounds.Height;
 
         if (DataContext is not MainWindowViewModel vm) return;
-        vm.TestPages.TestAE.StartDrag(elem);
+        vm.TestMain.TestPages.TestAE.StartDrag(elem);
 
         GhostItem.IsVisible = true;
 
@@ -86,6 +87,6 @@ public partial class TestArrangementOfElements : UserControl
         }
 
         if (DataContext is not MainWindowViewModel vm) return;
-        vm.TestPages.TestAE.Drop(elem, _startItemPosition, _endItemPosition);
+        vm.TestMain.TestPages.TestAE.Drop(elem, _startItemPosition, _endItemPosition);
     }
 }

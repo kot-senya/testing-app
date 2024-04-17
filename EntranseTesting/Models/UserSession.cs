@@ -15,5 +15,11 @@ public partial class UserSession
 
     public TimeOnly Time { get; set; }
 
+    public int CountHint { get; set; }
+
+    public int? IdAppSettings { get; set; }
+
+    public virtual AppSetting? IdAppSettingsNavigation { get; set; }
+
     public virtual ICollection<UserResponse> UserResponses { get; set; } = new List<UserResponse>();
 }

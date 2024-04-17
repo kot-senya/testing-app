@@ -1,0 +1,174 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EntranseTesting.TaskEditor"
+             x:DataType="vm:MainWindowViewModel"
+             xmlns:vm="using:EntranseTesting.ViewModels">
+  <Grid RowDefinitions="Auto,*" Margin="10">
+    <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
+          Margin="0 5"
+          HorizontalAlignment="Stretch">
+      <Button Content="Назад"
+              Command="{Binding ExitFromEditor}"
+              Grid.Column="0"/>
+      <TextBlock Text="{Binding EditorPages.TaskEditorPage.Header}"
+                 HorizontalAlignment="Center"
+                 Grid.Column="1" Classes="Header"/>
+      <Button Content="Сохранить"
+              Grid.Column="2"/>
+    </Grid>
+    <ScrollViewer Grid.Row="1"
+                  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+      <StackPanel Orientation="Vertical" Spacing="10" HorizontalAlignment="Stretch">
+        <!-- // Вопрос //-->
+        <StackPanel Orientation="Vertical" Margin="0 0 0 15">
+          <TextBlock Text="Вопрос" Classes="Header2"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"/>
+          <CheckBox Content="Включить в тест" IsChecked="{Binding EditorPages.TaskEditorPage.Q.InTest}" Margin="10 0"/>
+          <WrapPanel Orientation="Horizontal">
+            <StackPanel Spacing="10" Margin="10"
+                        Orientation="Vertical">
+              <WrapPanel Orientation="Vertical">
+                <TextBlock Text="Вид вопроса*"
+                           ToolTip.Tip="Данные утрачиваются в случае изменения типа вопроса"
+                           VerticalAlignment="Center"/>
+                <ComboBox Width="450" IsEnabled="{Binding EditorPages.TaskEditorPage.NoEditing}"
+                          ItemsSource="{Binding EditorPages.TaskEditorPage.Category}"
+                          SelectedItem="{Binding EditorPages.TaskEditorPage.SelectedCategory}"/>
+              </WrapPanel>
+              <WrapPanel Orientation="Vertical">
+                <TextBlock Text="Текст"
+                           VerticalAlignment="Center"/>
+                <TextBox Text="{Binding EditorPages.TaskEditorPage.Q.Name}"
+                         HorizontalContentAlignment="Stretch"
+                         HorizontalAlignment="Stretch"
+                         Width="450" Height="150"/>
+              </WrapPanel>              
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="10" Spacing="10"
+                        MinWidth="400" MaxWidth="600" HorizontalAlignment="Stretch">
+              <Grid ColumnDefinitions="Auto,*,Auto">
+                <TextBlock Text="Картинки"
+                           Grid.Column="0"/>
+                <Button Content="Добавить фото"
+                        Command="{Binding LoadImageForQuestion}"
+                        Grid.Column="2"/>
+              </Grid>
+              <ItemsRepeater ItemsSource="{Binding EditorPages.TaskEditorPage.QImage}"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch">
+                <ItemsRepeater.Layout>
+                  <WrapLayout HorizontalSpacing="10" VerticalSpacing="5" Orientation="Horizontal"/>
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Orientation="Vertical">
+                      <Button Tag="{StaticResource DeleteRegular}" Content="Удалить фото"
+                              HorizontalAlignment="Right"
+                              Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.DeleteQuestionImage}"
+                              CommandParameter="{Binding Id}"/>
+                      <Image Source="{Binding qImage}"
+                           MaxHeight="150" MaxWidth="200"
+                           Stretch="Uniform"/>
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+              </ItemsRepeater>
+            </StackPanel>
+          </WrapPanel>
+          <ContentControl Content="{Binding EditorPages.TaskEditorPage.TaskUC}"
+                          HorizontalAlignment="Stretch"
+                          Margin="10 0"/>
+        </StackPanel>
+        <!-- // Подсказки //-->
+        <StackPanel Margin="15 0 0 0">
+          <TextBlock Text="Подсказки" Classes="Header2"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Center"
+                     Grid.Row="0"/>
+          <ItemsRepeater ItemsSource="{Binding EditorPages.TaskEditorPage.QHint}"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Stretch">
+            <ItemsRepeater.Layout>
+              <StackLayout Orientation="Vertical"/>
+            </ItemsRepeater.Layout>
+            <ItemsRepeater.ItemTemplate>
+              <DataTemplate>
+                <Border BorderBrush="#696BFF" BorderThickness="0 0 0 1" Padding="0 5">
+                  <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                    <StackPanel Spacing="10">
+                      <WrapPanel Orientation="Vertical">
+                        <TextBlock Text="Цена"
+                                   VerticalAlignment="Center"/>
+                        <NumericUpDown Minimum="1" Maximum="5"
+                                       Value="{Binding Cost}"
+                                       Width="350"/>
+                      </WrapPanel>
+                      <WrapPanel Orientation="Vertical">
+                        <TextBlock Text="Текст"
+                                   VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding IdHintNavigation.Text}"
+                                 HorizontalContentAlignment="Stretch"
+                                 HorizontalAlignment="Stretch"
+                                 Width="350" Height="200"/>
+                      </WrapPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="10" Spacing="10"
+                          MaxWidth="450">
+                      <Grid ColumnDefinitions="Auto,*,Auto">
+                        <TextBlock Text="Картинки к подсказке"
+                                   Grid.Column="0"/>
+                        <Button Content="Добавить фото"
+                                Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).LoadImageForHint}"
+                                CommandParameter="{Binding IdHintNavigation.Id}"
+                                Grid.Column="2"/>
+                      </Grid>
+                      <ItemsRepeater ItemsSource="{Binding IdHintNavigation.HintImages}"
+                                     HorizontalAlignment="Stretch"
+                                     VerticalAlignment="Stretch">
+                        <ItemsRepeater.Layout>
+                          <WrapLayout HorizontalSpacing="10" VerticalSpacing="5"/>
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                          <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                              <Button Tag="{StaticResource DeleteRegular}" Content="Удалить фото"
+                                      Classes="icon"
+                                      Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.DeleteHintImage}"
+                                      CommandParameter="{Binding Id}"
+                                      HorizontalAlignment="Right"/>
+                              <Image Source="{Binding hImage}"
+                                     MaxHeight="150" MaxWidth="200"
+                                     Stretch="Uniform"/>
+                            </StackPanel>
+                          </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                      </ItemsRepeater>
+                    </StackPanel>
+                  </StackPanel>
+                    <Button Content="Удалить подсказку"
+                            HorizontalAlignment="Right"
+                            Margin="5"
+                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.DeleteHint}"
+                            CommandParameter="{Binding IdHint}"/>
+                  </StackPanel>                  
+                </Border>
+              </DataTemplate>
+            </ItemsRepeater.ItemTemplate>
+          </ItemsRepeater>
+
+          <Button Content="Добавить подсказку"
+                  Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.AddHint}"
+                  HorizontalAlignment="Stretch"
+                  HorizontalContentAlignment="Center"
+                  Grid.Row="2" Margin="10"/>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+
+</UserControl>

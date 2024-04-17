@@ -12,7 +12,7 @@
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
       
       <!-- Задание -->
-     <TextBlock Text="{Binding TestPages.TestAE.Question}"
+     <TextBlock Text="{Binding TestMain.TestPages.TestAE.Question}"
                  VerticalAlignment="Top"
                  HorizontalAlignment="Stretch"
                  TextWrapping="Wrap"/>
@@ -22,18 +22,18 @@
         <Border DragDrop.AllowDrop="True"
                 CornerRadius="5" Background="Transparent" BorderThickness="0" Margin="0 5">          
           <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <ItemsRepeater ItemsSource="{Binding TestPages.TestAE.Element}"
-                           MinHeight="100" MinWidth="200"
+            <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.TestAE.Element}"
                            VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
               <ItemsRepeater.Layout>
-                <StackLayout Spacing="10" Orientation="{Binding TestPages.TestAE.StackLayoutOrientation}"/>
+                <StackLayout Spacing="10" Orientation="{Binding TestMain.TestPages.TestAE.StackLayoutOrientation}"/>
               </ItemsRepeater.Layout>
               <ItemsRepeater.ItemTemplate>
                 <DataTemplate>
                   <Border PointerPressed="OnPointerPressed"
-                          Padding="10 5"
-                          Width="150" Height="45"
-                          Background="#DAE8FC" CornerRadius="5">
+                          Padding="10 5" 
+                          Classes="Arrangment"
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                          Background="#cfd7ff" CornerRadius="5">
                     <TextBlock Text="{Binding Name}" 
                                TextAlignment="Center"
                                VerticalAlignment="Center"
@@ -49,17 +49,16 @@
       <!-- Полупрозрачный элемент == перетаскиваемому объекту -->
       <Border Name="GhostItem"
               Padding="10 5" CornerRadius="5"
-              Background="#DAE8FC" Opacity="0.6"
-              Width="150" Height="45"
+              Classes="Arrangment"
+              Background="#cfd7ff" Opacity="0.6"
               HorizontalAlignment="Center" VerticalAlignment="Center">
-        <TextBlock Text="{Binding TestPages.TestAE.DraggingElementItem.Name, FallbackValue='TEXT'}"
+        <TextBlock Text="{Binding TestMain.TestPages.TestAE.DraggingElementItem.Name, FallbackValue='TEXT'}"
                    Foreground="Black"
                    TextAlignment="Center"
                    TextWrapping="Wrap"
                    VerticalAlignment="Center"
                    MaxWidth="140"/>
-      </Border>
-      
+      </Border>      
     </StackPanel>
   </ScrollViewer>
 </UserControl>

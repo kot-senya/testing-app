@@ -10,14 +10,14 @@
     <StackPanel Margin="20 0" Spacing="15" Background="Transparent">
 
       <!-- Задание -->
-      <TextBlock Text="{Binding TestPages.TestCAFS.Question}"
-                 IsVisible="{Binding TestPages.TestCAFS.QuestionVisible}"
+      <TextBlock Text="{Binding TestMain.TestPages.TestCAFS.Question}"
+                 IsVisible="{Binding TestMain.TestPages.TestCAFS.QuestionVisible}"
                  VerticalAlignment="Top"
                  HorizontalAlignment="Stretch"
                  TextWrapping="Wrap"/>
 
       <!-- Контейнер с элементами выбора -->
-      <ItemsRepeater ItemsSource="{Binding TestPages.TestCAFS.Element}" Margin="15"
+      <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.TestCAFS.Element}" Margin="15"
                      VerticalAlignment="Center"
                      HorizontalAlignment="Stretch">
         <ItemsRepeater.Layout>

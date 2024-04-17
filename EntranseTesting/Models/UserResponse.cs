@@ -13,6 +13,8 @@ public partial class UserResponse
 
     public bool Correctly { get; set; }
 
+    public bool HintApply { get; set; }
+
     public virtual Question IdQuestionNavigation { get; set; } = null!;
 
     public virtual UserSession IdSessionNavigation { get; set; } = null!;
