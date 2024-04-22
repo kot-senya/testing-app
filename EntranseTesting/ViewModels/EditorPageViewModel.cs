@@ -22,7 +22,7 @@ namespace EntranseTesting.ViewModels
         [ObservableProperty] bool enabledSettings = false;
         [ObservableProperty] bool enabledTaskMain = true;
 
-        [ObservableProperty] private bool _addQuestionVisible = false;
+        [ObservableProperty] private bool _editingVisible = false;
 
         public EditorPageViewModel(bool Editor)
         {
@@ -35,7 +35,7 @@ namespace EntranseTesting.ViewModels
         {
             EnabledSettings = false;
             EnabledTaskMain = true;
-            AddQuestionVisible = false;
+            EditingVisible = false;
             SettingsApp = new TestSettingsViewModel();
             EditorUC = new TestSettings();
         }
@@ -45,7 +45,7 @@ namespace EntranseTesting.ViewModels
         {
             EnabledTaskMain = false;
             EnabledSettings = true;
-            AddQuestionVisible = true;
+            EditingVisible = true;
             TaskMainPage = new TaskMainViewModel();
             EditorUC = new TaskMain();
         }
@@ -60,7 +60,7 @@ namespace EntranseTesting.ViewModels
                 //проверка на пустое начение
                 if (_set is null)
                 {
-                    await MessageBoxManager.GetMessageBoxStandard("Ошибка сохранения", "Значение оказалось пустым", ButtonEnum.Ok).ShowAsync();
+                    await MessageBoxManager.GetMessageBoxStandard("", "Значение оказалось пустым", ButtonEnum.Ok).ShowAsync();
                     return;
                 }
 
@@ -72,12 +72,13 @@ namespace EntranseTesting.ViewModels
                     _set.CountOfHints = 0;
                     _set.HalfCost = 0;
                 }
-
+                _set.Id = 0;
+                _set.ResultVisibiliry = true;
                 //сохраняем в базе
                 EntranceTestingContext baseConnection = new EntranceTestingContext();
                 baseConnection.AppSettings.Add(_set);
                 baseConnection.SaveChanges();
-                await MessageBoxManager.GetMessageBoxStandard("Данные сохранены", "Текущие настройки теста сохранены", ButtonEnum.Ok).ShowAsync();
+                await MessageBoxManager.GetMessageBoxStandard("", "Текущие настройки теста сохранены", ButtonEnum.Ok).ShowAsync();
 
                 SettingsApp = new TestSettingsViewModel();
 #if DEBUG
@@ -86,7 +87,7 @@ namespace EntranseTesting.ViewModels
             }
             catch (Exception ex)
             {
-                await MessageBoxManager.GetMessageBoxStandard("Ошибка сохранения", "По какой-то причине не удалось сохранить данные", ButtonEnum.Ok).ShowAsync();
+                await MessageBoxManager.GetMessageBoxStandard("", "По какой-то причине не удалось сохранить данные", ButtonEnum.Ok).ShowAsync();
 #if DEBUG
                 Debug.WriteLine(ex.Message);
 #endif

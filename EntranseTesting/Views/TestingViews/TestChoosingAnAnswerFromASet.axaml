@@ -15,7 +15,19 @@
                  VerticalAlignment="Top"
                  HorizontalAlignment="Stretch"
                  TextWrapping="Wrap"/>
-
+      <!-- Картинки -->
+      <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.TestCAFS.QImage}"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch">
+        <ItemsRepeater.Layout>
+          <WrapLayout HorizontalSpacing="15" VerticalSpacing="5" Orientation="Horizontal"/>
+        </ItemsRepeater.Layout>
+        <ItemsRepeater.ItemTemplate>
+          <DataTemplate>
+            <Image Source="{Binding qImage}" Classes="Test"/>
+          </DataTemplate>
+        </ItemsRepeater.ItemTemplate>
+      </ItemsRepeater>
       <!-- Контейнер с элементами выбора -->
       <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.TestCAFS.Element}" Margin="15"
                      VerticalAlignment="Center"

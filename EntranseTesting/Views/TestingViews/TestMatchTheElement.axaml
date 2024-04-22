@@ -15,7 +15,19 @@
                   VerticalAlignment="Top"
                   HorizontalAlignment="Stretch"
                   TextWrapping="Wrap"/>
-
+      <!-- Картинки -->
+      <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.TestME.QImage}"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch">
+        <ItemsRepeater.Layout>
+          <WrapLayout HorizontalSpacing="15" VerticalSpacing="5" Orientation="Horizontal"/>
+        </ItemsRepeater.Layout>
+        <ItemsRepeater.ItemTemplate>
+          <DataTemplate>
+            <Image Source="{Binding qImage}" Classes="Test"/>
+          </DataTemplate>
+        </ItemsRepeater.ItemTemplate>
+      </ItemsRepeater>
       <!-- Контейнер с элементами для соотношения -->
       <Grid Name="MainContainer"
             ColumnDefinitions="Auto,*,Auto"
@@ -32,8 +44,7 @@
 
           <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.TestME.ElementMatchGroup1}" Margin="15"
                          VerticalAlignment="Center"
-                         HorizontalAlignment="Left"
-                         MinWidth="100" MaxWidth="350">
+                         HorizontalAlignment="Left">
             <ItemsRepeater.Layout>
               <StackLayout Spacing="10" Orientation="Vertical"/>
             </ItemsRepeater.Layout>
@@ -42,16 +53,15 @@
                 <StackPanel Spacing="10" Orientation="Horizontal"
                             HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                   <Border  Padding="10 5"
-                           Background="#cfd7ff" CornerRadius="5"                           
+                           Background="#cfd7ff" CornerRadius="5"
                            Cursor="Hand" PointerPressed="OnPointerPressed"
-                           Width="270">
+                           Classes="CAFS">
                     <TextBlock Text="{Binding Name}"
                                TextAlignment="Center"
                                VerticalAlignment="Center"
-                               TextWrapping="Wrap"
-                               MaxWidth="350"/>
+                               TextWrapping="Wrap"/>
                   </Border>
-                  
+
                   <Border Background="#cfd7ff"
                           IsVisible="{Binding IsActive}"
                           CornerRadius="5"
@@ -80,8 +90,7 @@
 
           <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.TestME.ElementMatchGroup2}" Margin="15"
                          VerticalAlignment="Center"
-                         HorizontalAlignment="Right"
-                         MinWidth="100" MaxWidth="450">
+                         HorizontalAlignment="Right">
             <ItemsRepeater.Layout>
               <StackLayout Spacing="10" Orientation="Vertical"/>
             </ItemsRepeater.Layout>
@@ -98,17 +107,16 @@
                                TextAlignment="Center"
                                HorizontalAlignment="Stretch"
                                VerticalAlignment="Center"/>
-                    </Border>
-                  
+                  </Border>
+
                   <Border Background="#cfd7ff" CornerRadius="5"
                           Cursor="Hand"  Padding="10 5"
-                          Width="370"
+                          Classes="CAFS"
                           PointerPressed="OnPointerPressed">
                     <TextBlock Text="{Binding Name}"
                                TextAlignment="Left"
                                VerticalAlignment="Center"
-                               TextWrapping="Wrap" 
-                               MaxWidth="350"/>
+                               TextWrapping="Wrap"/>
                   </Border>
                 </StackPanel>
               </DataTemplate>

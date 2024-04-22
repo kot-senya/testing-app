@@ -7,6 +7,7 @@ using ReactiveUI;
 using System.Linq;
 using DynamicData;
 using Microsoft.EntityFrameworkCore;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace EntranseTesting.ViewModels
 {
@@ -17,12 +18,13 @@ namespace EntranseTesting.ViewModels
         int numberTask;
         string question;
         ObservableCollection<ItemCAFS> element = new ObservableCollection<ItemCAFS>();
-
+        List<QuestionImage> qImage = new List<QuestionImage>();
         public TestChoosingAnAnswerFromASetViewModel(int numberTask)
         {
             this.numberTask = numberTask;
 
             Question = baseConnection.Questions.FirstOrDefault(tb => tb.Id == numberTask).Name;
+            QImage = baseConnection.QuestionImages.Where(tb => tb.IdQuestion == numberTask).ToList();
 
             List<TextOfPutting> _text = baseConnection.TextOfPuttings.Where(tb => tb.IdQuestion == numberTask).ToList();
             foreach (TextOfPutting text in _text)
@@ -57,5 +59,6 @@ namespace EntranseTesting.ViewModels
         }
         public string? Question { get => question; set => question = value; }
         public ObservableCollection<ItemCAFS> Element { get => element; set => element = value; }
+        public List<QuestionImage> QImage { get => qImage; set => qImage = value; }
     }
 }

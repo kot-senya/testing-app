@@ -19,6 +19,7 @@ namespace EntranseTesting.ViewModels
         public const string CustomFormat = "element-item-format";
         [ObservableProperty] int numberTask;
         [ObservableProperty] string question;
+        [ObservableProperty] List<QuestionImage> qImage= new List<QuestionImage>();
         [ObservableProperty] Orientation stackLayoutOrientation;
         [ObservableProperty] private ElementOfArrangement? draggingElementItem;
         ObservableCollection<ElementOfArrangement> element = new ObservableCollection<ElementOfArrangement>();
@@ -30,6 +31,7 @@ namespace EntranseTesting.ViewModels
             this.numberTask = numberTask;
 
             Question = baseConnection.Questions.FirstOrDefault(tb => tb.Id == numberTask).Name;
+            QImage = baseConnection.QuestionImages.Where(tb => tb.IdQuestion == numberTask).ToList();
             StackLayoutOrientation = orientation;
 
             int responseIndex = Response.IndexResponse(numberTask);

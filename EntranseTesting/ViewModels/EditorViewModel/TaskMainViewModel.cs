@@ -30,7 +30,7 @@ namespace EntranseTesting.ViewModels
         public ObservableCollection<Question> Questions { get => questions; set { questions = value; OnPropertyChanged("Questions"); } }
         public string SelectedCategory { get => selectedCategory; set { selectedCategory = value; OnPropertyChanged("SelectedCategory"); filter(); } }
         public string? SearchLine { get => searchLine; set { searchLine = value; OnPropertyChanged("SearchLine"); filter(); } }
-        public bool SelectedInTest { get => selectedInTest; set { selectedInTest = value; OnPropertyChanged("SearchLine"); filter(); } }
+        public bool SelectedInTest { get => selectedInTest; set { selectedInTest = value; OnPropertyChanged("SelectedInTest"); filter(); } }
 
         public TaskMainViewModel()
         {

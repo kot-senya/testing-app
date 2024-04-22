@@ -191,7 +191,14 @@ namespace EntranseTesting.ViewModels
                         }
                     case "Подстановка ответов":
                         {
-                            SelectedCategory = "Подстановка ответов";
+                            MatchesMultiplyElement.Clear();
+                            List<TextOfPutting> tp = Q.TextOfPuttings.ToList();
+                            for (int i = 0; i < tp.Count; i++)
+                            {
+                                List<ElementOfPutting> ep = tp[i].ElementOfPuttings.ToList();
+                                MatchesMultiplyElement.Add(new ItemCAFS(tp[i].Name, ep));
+                            }
+                                SelectedCategory = "Подстановка ответов";
                             break;
                         }
                 }
@@ -357,7 +364,7 @@ namespace EntranseTesting.ViewModels
         {
             try
             {
-                var result = await MessageBoxManager.GetMessageBoxStandard("Удаление подсказки", "Вы действительно хотите удалить подсказку? Восстановить ее в дальнейшем будет нельзя", ButtonEnum.YesNo).ShowAsync();
+                var result = await MessageBoxManager.GetMessageBoxStandard("", "Вы действительно хотите удалить подсказку? Восстановить ее в дальнейшем будет нельзя", ButtonEnum.YesNo).ShowAsync();
                 switch (result)
                 {
                     case ButtonResult.Yes:

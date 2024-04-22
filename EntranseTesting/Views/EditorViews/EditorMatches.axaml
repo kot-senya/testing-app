@@ -84,6 +84,7 @@
       </ItemsRepeater>
 
       <Button Content="Добавить пару"
+              IsVisible="{Binding EditorPages.TaskEditorPage.NoEditing}"
               Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.AddItem}"
               HorizontalAlignment="Center"/>
     </StackPanel>

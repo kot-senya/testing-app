@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
 using ReactiveUI;
 using System.Linq;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace EntranseTesting.ViewModels
 {
@@ -15,12 +16,14 @@ namespace EntranseTesting.ViewModels
         int numberTask;
         string question;
         ObservableCollection<ElementOfChoose> element = new ObservableCollection<ElementOfChoose>();
-
+        List<QuestionImage> qImage = new List<QuestionImage>();
         public TestChoosingMultipleAnswersViewModel(int numberTask)
         {
             this.numberTask = numberTask;
 
             Question = baseConnection.Questions.FirstOrDefault(tb => tb.Id == numberTask).Name;
+            QImage = baseConnection.QuestionImages.Where(tb => tb.IdQuestion == numberTask).ToList();
+
             int responseIndex = Response.IndexResponse(numberTask);
             if (Response.responseUsers[responseIndex].UserResponseChooseAnswers.Count == 0)//если пользователь не отвечал
             {
@@ -48,5 +51,6 @@ namespace EntranseTesting.ViewModels
 
         public string Question { get => question; set => question = value; }
         public ObservableCollection<ElementOfChoose> Element { get => element; set => element = value; }
+        public List<QuestionImage> QImage { get => qImage; set => qImage = value; }
     }
 }

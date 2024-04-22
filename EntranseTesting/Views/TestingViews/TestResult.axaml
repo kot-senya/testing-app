@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EntranseTesting.TestResult"             
+             xmlns:vm="using:EntranseTesting.ViewModels"
+             x:DataType="vm:MainWindowViewModel">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="20 0" Background="Transparent" Spacing="15"
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+
+      <!-- Группа -->
+      <TextBlock Text="{Binding TestMain.TestResults.Session.UserGroup}"
+                 HorizontalAlignment="Stretch"
+                 TextWrapping="Wrap"/>
+      <!-- Пользователь -->
+      <TextBlock Text="{Binding TestMain.TestResults.Session.UserName}"
+                 VerticalAlignment="Top"
+                 HorizontalAlignment="Stretch"
+                 TextWrapping="Wrap"/>
+
+      <!-- Результат в числах -->
+      <TextBlock Text="{Binding TestMain.TestResults.CountCorrectly}"
+                 VerticalAlignment="Top"
+                 HorizontalAlignment="Center"
+                 TextWrapping="Wrap"/>
+
+      <!-- Результат в процентах -->
+      <TextBlock Text="{Binding TestMain.TestResults.ProcentCorrectly}"
+                 VerticalAlignment="Top"
+                 HorizontalAlignment="Stretch"
+                 TextWrapping="Wrap"/>
+     
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

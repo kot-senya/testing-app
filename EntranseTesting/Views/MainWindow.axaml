@@ -18,11 +18,16 @@
   </Design.DataContext>
   <Window.Resources>
     <conv:SizeConverter x:Key="SizeConverter"/>
-    <conv:ItemArrangementOfElements x:Key="ItemArrangementOfElements"/>
+    <conv:ImageConverter x:Key="ImageConverter"/>
     <x:Decimal x:Key="HeaderParameter">1.5</x:Decimal>
     <x:Decimal x:Key="Header2Parameter">1.3</x:Decimal>
     <x:Decimal x:Key="SmallParameter">0.8</x:Decimal>
     <x:Decimal x:Key="ArrangmentParameter">190.0</x:Decimal>
+    <x:Decimal x:Key="CAFSParameter">300.0</x:Decimal>
+    <x:Decimal x:Key="ImageParameter">1.1</x:Decimal>
+    <x:Decimal x:Key="IconWH">20.0</x:Decimal>
+    <x:Decimal x:Key="ButtonParametr">50.0</x:Decimal>
+    <x:Decimal x:Key="ButtonNavParametr">23.0</x:Decimal>
   </Window.Resources>
   <Window.Styles>
     <Style Selector=":is(TopLevel)">
@@ -71,9 +76,34 @@
       <Setter Property="Opacity" Value="0.9"/>
     </Style>
     <Style Selector=":is(Border).Arrangment">
-      <Setter Property="Width" Value="{Binding #MyFontSize.Value, Converter={StaticResource ItemArrangementOfElements}, ConverterParameter={StaticResource ArrangmentParameter}}"/>
+      <Setter Property="Width" Value="{Binding #MyFontSize.Value, Converter={StaticResource ImageConverter}, ConverterParameter={StaticResource ArrangmentParameter}}"/>
     </Style>
-    
+    <Style Selector=":is(Border).CAFS">
+      <Setter Property="Width" Value="{Binding #MyFontSize.Value, Converter={StaticResource ImageConverter}, ConverterParameter={StaticResource CAFSParameter}}"/>
+    </Style>
+    <Style Selector=":is(IconElement)">
+      <Setter Property="Width" Value="{Binding #MyFontSize.Value, Converter={StaticResource ImageConverter}, ConverterParameter={StaticResource IconWH}}"/>
+      <Setter Property="Height" Value="{Binding #MyFontSize.Value, Converter={StaticResource ImageConverter}, ConverterParameter={StaticResource IconWH}}"/>
+    </Style>
+    <Style Selector=":is(Button).Progress">
+      <Setter Property="Width" Value="{Binding #MyFontSize.Value, Converter={StaticResource ImageConverter}, ConverterParameter={StaticResource ButtonParametr}}"/>
+    </Style>
+    <Style Selector=":is(Button).ProgressNav">
+      <Setter Property="Width" Value="{Binding #MyFontSize.Value, Converter={StaticResource ImageConverter}, ConverterParameter={StaticResource ButtonNavParametr}}"/>
+    </Style>
+    <Style Selector=":is(Image).Test">
+      <Setter Property="MaxWidth" Value="150"/>
+      <Setter Property="MaxHeight" Value="100"/>
+      <Setter Property="Stretch" Value="Uniform"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector=":is(Expander).Content">
+      <Setter Property="Width" Value="{Binding #MyFontSize.Value, Converter={StaticResource ImageConverter}, ConverterParameter={StaticResource CAFSParameter}}"/>
+    </Style>
+    <Style Selector=":is(Image).Test:pointerover">
+      <Setter Property="MaxWidth" Value="350"/>
+      <Setter Property="MaxHeight" Value="300"/>
+    </Style>
     <Style Selector=":is(Button).icon">
       <Setter Property="Template">
         <ControlTemplate>
@@ -133,31 +163,34 @@
   </Window.Styles>
 
   <SplitView IsPaneOpen="{Binding IsPaneOpen}"
-             CompactPaneLength="48"
+             CompactPaneLength="50"
              OpenPaneLength="300"
              DisplayMode="CompactInline">
     <SplitView.Pane>
-      <ScrollViewer HorizontalScrollBarVisibility="Disabled"
-                    VerticalScrollBarVisibility="Auto">
-        <Grid>
+      <Grid RowDefinitions="Auto, *, Auto">
+        <Button Command="{Binding IsClickPainCommand}" Classes="icon"
+                 Tag="{StaticResource LineHorizontal3Regular}"
+                 Background="Transparent" Grid.Row="0" Margin="5"/>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto"
+                      Grid.Row="1">
           <StackPanel Spacing="5" Margin="5"
                       VerticalAlignment="Top">
-            <Button Command="{Binding IsClickPainCommand}" Classes="icon"                    
-                    Tag="{StaticResource LineHorizontal3Regular}"
-                    Background="Transparent"/>
-            
+
             <!-- // Кнопка Авторизация //-->
             <Button Command="{Binding AuthorizationCommand}" Classes="icon"
                     IsVisible="{Binding IsAuth}" HorizontalAlignment="Stretch"
                     Tag="{StaticResource PersonRegular}" Content="Авторизироваться"
+                    ToolTip.Tip="Авторизироваться в системе"
                     Background="Transparent"/>
-              
+
             <!-- // Кнопка Изменения текста //-->
             <Button Command="{Binding IsTextClickCommand}" Classes="icon"
-                    HorizontalAlignment="Stretch" 
+                    HorizontalAlignment="Stretch"
                     Tag="{StaticResource TextFieldRegular}" Content="Отображение текста"
+                    ToolTip.Tip="Настройка отображения текста"
                     Background="Transparent"/>
-            
+
             <!-- // Параметры Изменения текста //-->
             <WrapPanel IsVisible="{Binding TextChangeVisible}" Margin="10 0">
               <TextBlock Text="Шрифт"/>
@@ -171,18 +204,19 @@
               <TextBlock Text="Размер шрифта"/>
               <NumericUpDown Name="MyFontSize"
                              Value="{Binding IS.MyFontSize}"
-                             Minimum="8" Maximum="30"
+                             Minimum="10" Maximum="28"
                              Increment="2"
                              MinWidth="100"
                              ButtonSpinnerLocation="Left"/>
             </WrapPanel>
-            
+
             <!-- // Кнопка Инфо Подсказки //-->
             <Button Command="{Binding IsHintClickCommand}" Classes="icon"
                     IsVisible="{Binding Info}" HorizontalAlignment="Stretch"
                     Tag="{StaticResource LightbulbCircleRegular}" Content="Система подсказок"
+                    ToolTip.Tip="Информация о системе подсказок"
                     Background="Transparent"/>
-            
+
             <!-- // Текст Инфо Подсказки //-->
             <TextBlock Text="{Binding Mess.InfoHint}"
                        IsVisible="{Binding HintVisible}"
@@ -190,22 +224,100 @@
 
             <!-- // Кнопка Добавления вопроса //-->
             <Button Command="{Binding AddQuestion}" Classes="icon"
-                   IsVisible="{Binding EditorPages.AddQuestionVisible}" HorizontalAlignment="Stretch"
+                   IsVisible="{Binding EditorPages.EditingVisible}" HorizontalAlignment="Stretch"
                    Tag="{StaticResource AddSquareRegular}" Content="Добавить вопрос"
+                    ToolTip.Tip="Добавить вопрос"
                    Background="Transparent"/>
+
+            <!-- // Фильтрация и сортировка //-->
+            <StackPanel Orientation="Vertical" Spacing="5"
+                        IsVisible="{Binding EditorPages.EditingVisible}" >
+              <Button Command="{Binding IsClickPainCommand}" Classes="icon"
+                   HorizontalAlignment="Stretch"
+                   Tag="{StaticResource FilterRegular}" Content="Фильтрация и сортировка"
+                      ToolTip.Tip="Фильтрация и сортировка вопросов"
+                   Background="Transparent"/>
+              <StackPanel Orientation="Vertical" Spacing="10"
+                        IsVisible="{Binding IsPaneOpen}">
+                <!-- // Поиск //-->
+                <StackPanel Orientation="Vertical" Margin="5">
+                  <TextBlock Text="Искать по вопросу"
+                             HorizontalAlignment="Stretch"/>
+                  <TextBox Text="{Binding EditorPages.TaskMainPage.SearchLine}"
+                           TextBlock.TextWrapping="NoWrap"
+                           HorizontalAlignment="Stretch"/>
+                </StackPanel>
+                <!-- // Фильтрация //-->
+                <StackPanel Orientation="Vertical" Margin="5">
+                  <TextBlock Text="Фильтровать по типу задания"
+                             HorizontalAlignment="Stretch"/>
+                  <ComboBox ItemsSource="{Binding EditorPages.TaskMainPage.CategoryList}"
+                            SelectedItem="{Binding EditorPages.TaskMainPage.SelectedCategory}"
+                            TextBlock.TextWrapping="NoWrap"
+                            TextBlock.TextTrimming="WordEllipsis"
+                            HorizontalAlignment="Stretch"/>
+                </StackPanel>
+                <!-- // Те которые включаются в тест //-->
+                <CheckBox Content="Вопросы, включаемые в тест"
+                          HorizontalAlignment="Stretch" Margin="5"
+                          IsChecked="{Binding  EditorPages.TaskMainPage.SelectedInTest}"/>
+              </StackPanel>
+            </StackPanel>
+
+            <!-- Вопросы к заданиям-->
+            <StackPanel Orientation="Vertical" Spacing="5" HorizontalAlignment="Stretch"
+                        IsVisible="{Binding ButtonVisible}" >
+              <Button Command="{Binding IsClickPainCommand}" Classes="icon"
+                   HorizontalAlignment="Stretch"
+                   Tag="{StaticResource TableSettingsRegular}" Content="Навигация по тесту"
+                      ToolTip.Tip="Навигация по тесту"
+                   Background="Transparent"/>
+              <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.ProgressButtons}"
+                         VerticalAlignment="Stretch" HorizontalAlignment="Center"
+                         Margin="5 15" IsVisible="{Binding IsPaneOpen}">
+                  <ItemsRepeater.Layout>
+                    <WrapLayout HorizontalSpacing="5" VerticalSpacing="5" Orientation="Horizontal"/>
+                  </ItemsRepeater.Layout>
+                  <ItemsRepeater.ItemTemplate>
+                    <DataTemplate>
+                      <Button Content="{Binding Num}"
+                              Classes="Progress"
+                              Classes.active="{Binding Active}" Classes.check="{Binding Check}"
+                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TestMain.ClickToQuestion}"
+                              CommandParameter="{Binding Num}"
+                              HorizontalContentAlignment="Center"
+                              VerticalContentAlignment="Center">
+                        <Button.Styles>
+                          <Style Selector=":is(Button).check">
+                            <Setter Property="Background" Value="LightGreen"/>
+                          </Style>
+                          <Style Selector=":is(Button).active">
+                            <Setter Property="Background" Value="#696BFF"/>
+                          </Style>
+                        </Button.Styles>
+                      </Button>
+                    </DataTemplate>
+                  </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+            </StackPanel>
           </StackPanel>
-          
-          <!-- // Кнопка выхода //-->
-          <Button Command="{Binding ToBackCommand}" Margin="5"
-                  IsVisible="{Binding IsExit}" Classes="icon"
-                  VerticalAlignment="Bottom" HorizontalAlignment="Right"
-                  Tag="{StaticResource SignOutRegular}" Content="Выйти"
-                  Background="Transparent"/>
-        </Grid>
-      </ScrollViewer>
+
+        </ScrollViewer>
+        <!-- // Кнопка выхода //-->
+        <Button Command="{Binding ToBackCommand}" Margin="5"
+                IsVisible="{Binding IsExit}" Classes="icon"
+                VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                Tag="{StaticResource SignOutRegular}" Content="Выйти"
+                ToolTip.Tip="Вернуться на главную страницу"
+                Background="Transparent"  Grid.Row="2"/>
+      </Grid>
     </SplitView.Pane>
+
     <SplitView.Content>
-      <ContentControl Content="{Binding UC}"/>
+      <ContentControl Content="{Binding UC}"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Name="TestContent"/>
     </SplitView.Content>
   </SplitView>
 </Window>

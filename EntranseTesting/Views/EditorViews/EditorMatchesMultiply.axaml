@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:conv="clr-namespace:EntranseTesting.Converter;assembly=EntranseTesting"        
+             xmlns:conv="clr-namespace:EntranseTesting.Converter;assembly=EntranseTesting"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="EntranseTesting.EditorMatchesMultiply"
@@ -20,57 +20,61 @@
       </ItemsRepeater.Layout>
       <ItemsRepeater.ItemTemplate>
         <DataTemplate>
-          <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Stretch"
-                      Name="ElementText">
-            <Button Content="х"
-                    Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.DeleteItem}"
-                    CommandParameter="{Binding}"
-                    IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.NoEditing}"
-                    VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <TextBox Width="350" Height="80"
-                     Margin="10 0"
-                     Text="{Binding Text}"
-                     VerticalContentAlignment="Top"/>
-            <StackPanel Orientation="Vertical">
-              <ItemsRepeater ItemsSource="{Binding ElementEditor}">
-                <ItemsRepeater.Layout>
-                  <StackLayout Spacing="5" Orientation="Vertical"/>
-                </ItemsRepeater.Layout>
-                <ItemsRepeater.ItemTemplate>
-                  <DataTemplate>
-                    <StackPanel Orientation="Horizontal" Spacing="10"
-                                Name="ElementChoosing">
-                      <Button Content="х"
-                              Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.DeleteItemCAFS}"
-                              CommandParameter="{Binding}"
-                              IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.NoEditing}"
-                              VerticalAlignment="Center">
-                        <Button.CommandParameter>
-                          <MultiBinding Converter="{StaticResource ItemCAFSConverter}">
-                            <Binding ElementName="ElementText" Path="DataContext"/>
-                            <Binding ElementName="ElementChoosing" Path="DataContext" />
-                          </MultiBinding>
-                        </Button.CommandParameter>
-                      </Button>
-                      <CheckBox IsChecked="{Binding Correctly}"
-                                VerticalAlignment="Center"/>
-                      <TextBox Text="{Binding Name}"
-                               Width="350" Height="80"/>
-                    </StackPanel>
-                  </DataTemplate>
-                </ItemsRepeater.ItemTemplate>
-              </ItemsRepeater>
-              <Button Content="Добавить элемент выбора" Margin="10 0" 
-                      Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.AddItemCAFS}"
+          <Border BorderBrush="LightCoral" BorderThickness="0 0 0 1">
+            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Stretch"
+                        Name="ElementText">
+              <Button Content="x"
+                      Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.DeleteItem}"
                       CommandParameter="{Binding}"
+                      IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.NoEditing}"
                       VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            </StackPanel>
-          </StackPanel>
+              <TextBox Width="350" Height="80"
+                       Margin="10 0"
+                       Text="{Binding Text}"
+                       VerticalContentAlignment="Top"/>
+              <StackPanel Orientation="Vertical">
+                <ItemsRepeater ItemsSource="{Binding ElementEditor}">
+                  <ItemsRepeater.Layout>
+                    <StackLayout Spacing="5" Orientation="Vertical"/>
+                  </ItemsRepeater.Layout>
+                  <ItemsRepeater.ItemTemplate>
+                    <DataTemplate>
+                      <StackPanel Orientation="Horizontal" Spacing="10"
+                                  Name="ElementChoosing">
+                        <Button Content="x"
+                                Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.DeleteItemCAFS}"
+                                CommandParameter="{Binding}"
+                                IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.NoEditing}"
+                                VerticalAlignment="Center">
+                          <Button.CommandParameter>
+                            <MultiBinding Converter="{StaticResource ItemCAFSConverter}">
+                              <Binding ElementName="ElementText" Path="DataContext"/>
+                              <Binding ElementName="ElementChoosing" Path="DataContext" />
+                            </MultiBinding>
+                          </Button.CommandParameter>
+                        </Button>
+                        <CheckBox IsChecked="{Binding Correctly}"
+                                  VerticalAlignment="Center"/>
+                        <TextBox Text="{Binding Name}"
+                                 Width="350" Height="80"/>
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+                <Button Content="Добавить элемент выбора" Margin="10 0"
+                        IsVisible="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.NoEditing}"
+                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.AddItemCAFS}"
+                        CommandParameter="{Binding}"
+                        VerticalAlignment="Center" HorizontalAlignment="Center"/>
+              </StackPanel>
+            </StackPanel>           
+          </Border>
         </DataTemplate>
       </ItemsRepeater.ItemTemplate>
     </ItemsRepeater>
 
     <Button Content="Добавить элемент"
+            IsVisible="{Binding EditorPages.TaskEditorPage.NoEditing}"
             Command="{Binding  $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskEditorPage.AddItem}"
             HorizontalAlignment="Center"/>
   </StackPanel>

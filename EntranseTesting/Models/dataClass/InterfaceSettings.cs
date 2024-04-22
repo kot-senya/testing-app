@@ -21,5 +21,7 @@ namespace EntranseTesting.Models
         private FontFamily selectedFont = "Comic Sans MS";
         [ObservableProperty]
         private int myFontSize = 16;
+       
+        public static int take = 0;
     }
 }

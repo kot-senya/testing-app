@@ -18,6 +18,7 @@ using System.Text.RegularExpressions;
 using DynamicData;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.ComponentModel;
+using System.Xml.Linq;
 
 namespace EntranseTesting.ViewModels
 {
@@ -38,12 +39,14 @@ namespace EntranseTesting.ViewModels
         ObservableCollection<ElementOfGroup> elementMatchGroup1 = new ObservableCollection<ElementOfGroup>();
         ObservableCollection<ElementOfGroup> elementMatchGroup2 = new ObservableCollection<ElementOfGroup>();
         [ObservableProperty] List<ItemMatch> matches = new List<ItemMatch>();
+        [ObservableProperty] List<QuestionImage> qImage = new List<QuestionImage>();
 
         public TestMatchTheElementViewModel(int numberTask)
         {
             this.numberTask = numberTask;
 
             Question = baseConnection.Questions.FirstOrDefault(tb => tb.Id == numberTask).Name;
+            QImage = baseConnection.QuestionImages.Where(tb => tb.IdQuestion == numberTask).ToList();
 
             List<Models.Group> _group = baseConnection.Groups.Where(tb => tb.IdQuestion == numberTask).ToList();
             NameGroup1 = _group[0].Name;
@@ -58,6 +61,32 @@ namespace EntranseTesting.ViewModels
             Random.Shared.Shuffle(CollectionsMarshal.AsSpan(_list2));
             foreach (ElementOfGroup elem in _list2)
                 ElementMatchGroup2.Add(elem);
+
+            //заполняем данные
+            int responseIndex = Response.IndexResponse(numberTask);
+            if (Response.responseUsers[responseIndex].UserResponseMatchTheElements.Count > 0)//если пользователь не отвечал
+            {
+                Matches.Clear();
+                List<UserResponseMatchTheElement> _response = Response.responseUsers[responseIndex].UserResponseMatchTheElements.ToList();
+                int i = 1;
+                foreach (UserResponseMatchTheElement item in _response)
+                {
+                    int index1 = _list1.IndexOf(_list1.FirstOrDefault(tb => tb.Id == item.IdElement1));
+                    int index2 = _list2.IndexOf(_list2.FirstOrDefault(tb => tb.Id == item.IdElement2));
+                    _list1[index1].IsActive = true;
+                    _list2[index2].IsActive = true;
+                    _list1[index1].NumGroup = i;
+                    _list2[index2].NumGroup = i;
+                    ItemMatch elem = new ItemMatch()
+                    {
+                        Elem1 = _list1[index1],
+                        Elem2 = _list2[index2],
+                        NumGroup = i++
+                    };
+                    Matches.Add(elem);
+
+                }
+            }
         }
 
         public ObservableCollection<ElementOfGroup> ElementMatchGroup1 { get => elementMatchGroup1; set { elementMatchGroup1 = value; OnPropertyChanged(); } }

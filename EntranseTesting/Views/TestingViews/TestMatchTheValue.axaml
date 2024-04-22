@@ -14,7 +14,19 @@
                   VerticalAlignment="Top"
                   HorizontalAlignment="Stretch"
                   TextWrapping="Wrap"/>
-
+      <!-- Картинки -->
+      <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.TestMV.QImage}"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch">
+        <ItemsRepeater.Layout>
+          <WrapLayout HorizontalSpacing="15" VerticalSpacing="5" Orientation="Horizontal"/>
+        </ItemsRepeater.Layout>
+        <ItemsRepeater.ItemTemplate>
+          <DataTemplate>
+            <Image Source="{Binding qImage}" Classes="Test"/>
+          </DataTemplate>
+        </ItemsRepeater.ItemTemplate>
+      </ItemsRepeater>
       <!--// Элементы соотношения //-->
       <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.TestMV.Elements}" Margin="15"
                      VerticalAlignment="Center"

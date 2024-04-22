@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using static System.Net.WebRequestMethods;
 using File = System.IO.File;
 
@@ -35,6 +36,7 @@ namespace EntranseTesting.ViewModels
         [ObservableProperty] private bool _textChangeVisible = false;
         [ObservableProperty] private bool _hintVisible = false;
         [ObservableProperty] private bool _info = true;
+        [ObservableProperty] private bool _buttonVisible = false;
 
         //локальные классы для работы
         [ObservableProperty] InterfaceSettings iS = new InterfaceSettings();//пользовательский интерфейс
@@ -96,12 +98,14 @@ namespace EntranseTesting.ViewModels
                 {
                     IsAuth = false;
                     IsExit = true;
+                    ButtonVisible = true;
                     TestMain.TestPages = new TestPageViewModel();
                     UC = new TestPage();
                     //настраиваем ответы
                     Response.userSession = new UserSession()
                     {
                         Date = DateTime.Now,
+                        Time = new TimeOnly(0, 0),
                         UserGroup = TestMain.GroupUser.ToString(),
                         UserName = TestMain.NameUser.ToString(),
                         CountHint = 0,
@@ -121,6 +125,7 @@ namespace EntranseTesting.ViewModels
 
         }
 
+
         [RelayCommand]
         private void Authorization()
         {
@@ -137,7 +142,42 @@ namespace EntranseTesting.ViewModels
         [RelayCommand]
         private async void ToBack()
         {
-            if (typeof(TestPage) == UC.GetType())
+            if(typeof(TaskEditor)== UC.GetType())
+            {
+                try
+                {
+                    var result = await MessageBoxManager.GetMessageBoxStandard("Выйти из редактора", "Вы действительно хотите выйти из редактора? Все введенные вами изменения могут удалиться", ButtonEnum.YesNo).ShowAsync();
+                    switch (result)
+                    {
+                        case ButtonResult.Yes:
+                            {
+                                if (EditorPages.TaskEditorPage.Header == "Добавление вопроса")
+                                {
+                                    EntranceTestingContext connection = new EntranceTestingContext();
+                                    Question q = connection.Questions.FirstOrDefault(tb => tb.Id == EditorPages.TaskEditorPage.Q.Id);
+                                    connection.Questions.Remove(q);
+                                    connection.SaveChanges();
+                                }
+                                break;
+                            }
+                        case ButtonResult.No:
+                            {
+                                return;
+                            }
+                    }
+                }
+                catch (Exception ex)
+                {
+#if DEBUG
+                    Debug.Write(ex.Message);
+#endif
+                }
+            }
+            if (typeof(EditorPage) == UC.GetType())
+            {
+                EditorPages.EditingVisible = false;
+            }
+            if (typeof(TestPage) == UC.GetType()) 
             {
                 var result = await MessageBoxManager.GetMessageBoxStandard("Выход из теста", "Если вы выйдите из теста, то результат не сохраниться", ButtonEnum.YesNo).ShowAsync();
                 switch (result)
@@ -151,24 +191,25 @@ namespace EntranseTesting.ViewModels
                             return;
                         }
                 }
+                ButtonVisible = false;
             }
             Info = true;
-
             IsAuth = true;
             IsExit = false;
+            TestMain = new TestMainViewModel();
             UC = new TestMain();
         }
 
         public void AddQuestion()
         {
-            EditorPages.AddQuestionVisible = false;
+            EditorPages.EditingVisible = false;
             EditorPages.TaskEditorPage = new TaskEditorViewModel();
             UC = new TaskEditor();
         }
 
         public void EditQuestion(int idQuestion)
         {
-            EditorPages.AddQuestionVisible = false;
+            EditorPages.EditingVisible = false;
             EditorPages.TaskEditorPage = new TaskEditorViewModel(idQuestion);
             UC = new TaskEditor();
         }
@@ -189,14 +230,14 @@ namespace EntranseTesting.ViewModels
                                 connection.Questions.Remove(q);
                                 connection.SaveChanges();
                             }
-                            EditorPages.AddQuestionVisible = true;
+                            EditorPages.EditingVisible = true;
                             EditorPages = new EditorPageViewModel(true);
                             UC = new EditorPage();
                             break;
                         }
                     case ButtonResult.No:
                         {
-                            break;
+                            return;
                         }
                 }
 
