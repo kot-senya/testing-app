@@ -7,31 +7,37 @@
              xmlns:vm="using:EntranseTesting.ViewModels"
              x:DataType="vm:MainWindowViewModel">
   <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-    <StackPanel Margin="20 0" Background="Transparent" Spacing="15"
+    <StackPanel Margin="20 0" Background="Transparent" Spacing="5"
                 HorizontalAlignment="Center" VerticalAlignment="Center">
-
+      
+      <TextBlock Text="Результат тестирования"
+                 HorizontalAlignment="Center" Classes="Header"
+                 Margin="0 0 0 15"/>
       <!-- Группа -->
-      <TextBlock Text="{Binding TestMain.TestResults.Session.UserGroup}"
-                 HorizontalAlignment="Stretch"
-                 TextWrapping="Wrap"/>
+      <TextBlock Text="{Binding TestMain.TestResults.Session.UserGroup, StringFormat='Группа: {0}'}"
+                 HorizontalAlignment="Right"/>
       <!-- Пользователь -->
-      <TextBlock Text="{Binding TestMain.TestResults.Session.UserName}"
-                 VerticalAlignment="Top"
-                 HorizontalAlignment="Stretch"
-                 TextWrapping="Wrap"/>
+      <TextBlock Text="{Binding TestMain.TestResults.Session.UserName, StringFormat='Пользователь: {0}'}"
+                 HorizontalAlignment="Right"/>
 
+      <!-- Оценка -->
+      <TextBlock Text="{Binding TestMain.TestResults.Session.Raiting, StringFormat='Оценка: {0}'}"
+                 HorizontalAlignment="Center" Classes="Header"
+                 Margin="0 15 0 0"/>
+      
       <!-- Результат в числах -->
-      <TextBlock Text="{Binding TestMain.TestResults.CountCorrectly}"
-                 VerticalAlignment="Top"
-                 HorizontalAlignment="Center"
-                 TextWrapping="Wrap"/>
+      <TextBlock Text="{Binding TestMain.TestResults.Session.CountCorrectly}"
+                 HorizontalAlignment="Center" Classes="Header"
+                 Margin="0 0 0 15"/>
 
       <!-- Результат в процентах -->
-      <TextBlock Text="{Binding TestMain.TestResults.ProcentCorrectly}"
-                 VerticalAlignment="Top"
-                 HorizontalAlignment="Stretch"
-                 TextWrapping="Wrap"/>
-     
+      <TextBlock Text="{Binding TestMain.TestResults.Session.ProcentCorrectly, StringFormat='Правильных ответов {0}%'}"
+                 HorizontalAlignment="Stretch"/>
+      <!-- Кнопка выйти -->
+     <Button HorizontalAlignment="Center" 
+             Command="{Binding ToBackCommand}" Margin="5"
+             VerticalAlignment="Bottom"
+             Content="Вернуться на главную"/>
     </StackPanel>
   </ScrollViewer>
 </UserControl>

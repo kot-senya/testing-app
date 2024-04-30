@@ -13,7 +13,7 @@ public partial class UserSession
 
     public DateTime Date { get; set; }
 
-    public TimeOnly Time { get; set; }
+    public TimeSpan Time { get; set; }
 
     public int CountHint { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using DynamicData.Binding;
+﻿using Avalonia.Threading;
+using DynamicData.Binding;
 using EntranseTesting.Models.customClass;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,7 +18,7 @@ namespace EntranseTesting.Models
         public static List<UserResponse> responseUsers = new List<UserResponse>();
         public static List<QuestionHint> questionHints = new List<QuestionHint>();
         public static bool change = false;
-
+        public static DispatcherTimer timer = new DispatcherTimer();
         public static void loadHints(List<Question> questionsCollection)
         {
             EntranceTestingContext connection = new EntranceTestingContext();
@@ -71,11 +72,11 @@ namespace EntranseTesting.Models
             change = true;
             //проверка задания
             bool correctly = true;
-            element = (ObservableCollection<ElementOfArrangement>)element.OrderBy(tb => tb.Position);
+            List<ElementOfArrangement> elem = element.OrderBy(tb => tb.Position).ToList();
             list = responseUsers[responseIndex].UserResponseArrangements.OrderBy(tb => tb.Position).ToList();
-            for (int j = 0; i < element.Count; j++)
+            for (int j = 0; i < elem.Count; j++)
             {
-                if (element[j].Position != list[j].Position)
+                if (elem[j].Id != list[j].IdElement)
                     correctly = false;
             }
             responseUsers[responseIndex].Correctly = correctly;
@@ -91,18 +92,16 @@ namespace EntranseTesting.Models
                 foreach (var item in element)
                 {
                     int index = list.IndexOf(list.FirstOrDefault(tb => tb.IdElement == item.Id));
-                    list[index].Usercorrectly = (item.UserCorrectly == null) ? false : item.UserCorrectly;
-                    if ((bool)list[index].Usercorrectly)
-                        change = true;
-                }
-                foreach (var item in list)
-                    responseUsers[responseIndex].UserResponseChooseAnswers.Add(item);
+                    list[index].Usercorrectly = (item.UserCorrectly == null || item.UserCorrectly == false) ? false : item.UserCorrectly;
+                    if ((bool)list[index].Usercorrectly) change = true;
+                }                
             }
             //проверка задания
             if (change)
             {
+                foreach (var item in list) responseUsers[responseIndex].UserResponseChooseAnswers.Add(item);
+
                 bool correctly = true;
-                list = responseUsers[responseIndex].UserResponseChooseAnswers.ToList();
                 if (manyAnswer)
                 {
                     foreach (var item in list)
@@ -115,38 +114,54 @@ namespace EntranseTesting.Models
                 else
                 {
                     var userCorrectly = list.FirstOrDefault(tb => tb.Usercorrectly == true);
-                    var elem = element.FirstOrDefault(tb => tb.Id == userCorrectly.Id);
-                    if (elem == null || elem.Correctly != true)
+                    var elem = element.FirstOrDefault(tb => tb.Id == userCorrectly.IdElement);
+                    if (elem.Correctly != true)
                         correctly = false;
                 }
                 responseUsers[responseIndex].Correctly = correctly;
             }
+            else
+                responseUsers[responseIndex].Correctly = false;
         }
         public static void SaveChangesCAFS(int idQuestion, ObservableCollection<ItemCAFS> element)
-        {            
-            int responseIndex = IndexResponse(idQuestion);
-            change = false;
-            responseUsers[responseIndex].Correctly = false;
-            /*
+        {
             change = true;
             EntranceTestingContext connection = new EntranceTestingContext();
-            
-            List<UserResponseMultiplyAnswer> list = responseUsers[responseIndex].UserResponseMultiplyAnswes.ToList();
-            responseUsers[responseIndex].UserResponseMultiplyAnswes.Clear();
+
+            int responseIndex = IndexResponse(idQuestion);
+            responseUsers[responseIndex].UserResponseMultiplyAnswers.Clear();
 
             foreach (var item in element)
             {
-                if(item.SelectedItem != "--")
+                if (item.SelectedItem != "--")
                 {
                     TextOfPutting t = connection.TextOfPuttings.FirstOrDefault(tb => tb.Name == item.Text && tb.IdQuestion == idQuestion);
                     ElementOfPutting e = connection.ElementOfPuttings.FirstOrDefault(tb => tb.Name == item.SelectedItem && tb.IdText == t.Id);
-                    responseUsers[responseIndex].UserResponseMultiplyAnswes.Add(new UserResponseMultiplyAnswer() { IdElement = e.Id, IdText = t.Id});
-                } 
-           else
-           {
-               change = false;
-           }
-            }*/
+                    responseUsers[responseIndex].UserResponseMultiplyAnswers.Add(new UserResponseMultiplyAnswer() { IdElement = e.Id, IdText = t.Id });
+                }
+                else
+                {
+                    change = false;
+                }
+            }
+
+            //проверка задания
+            if (change)
+            {
+                bool correctly = true;
+                List<UserResponseMultiplyAnswer> _list = responseUsers[responseIndex].UserResponseMultiplyAnswers.ToList();
+
+                for (int i = 0; i < _list.Count; i++)
+                {
+                    ElementOfPutting e = connection.ElementOfPuttings.FirstOrDefault(tb => tb.Id == _list[i].IdElement);
+                    if (e.Correctly != true)
+                        correctly = false;
+                }
+                responseUsers[responseIndex].Correctly = correctly;
+            }
+            else
+                responseUsers[responseIndex].Correctly = false;
+
         }
         public static void SaveChangesMatchTheElement(int idQuestion, List<ItemMatch> element)
         {
@@ -174,20 +189,21 @@ namespace EntranseTesting.Models
             {
                 bool correctly = true;
                 List<UserResponseMatchTheElement> list = responseUsers[responseIndex].UserResponseMatchTheElements.ToList();
-                var group1 = connection.Groups.Include(tb => tb.ElementOfGroups).ToList()[0];
-                var group2 = connection.Groups.Include(tb => tb.ElementOfGroups).ToList()[1];
+                var group1 = connection.Groups.Where(tb => tb.IdQuestion == idQuestion).Include(tb => tb.ElementOfGroups).ToList()[0];
+                var group2 = connection.Groups.Where(tb => tb.IdQuestion == idQuestion).Include(tb => tb.ElementOfGroups).ToList()[1];
 
                 for (int i = 0; i < countMatch; i++)
                 {
                     var elem1 = group1.ElementOfGroups.FirstOrDefault(tb => tb.Id == list[i].IdElement1 || tb.Id == list[i].IdElement2);
-                    var elem2 = group1.ElementOfGroups.FirstOrDefault(tb => tb.Id == list[i].IdElement1 || tb.Id == list[i].IdElement2);
+                    var elem2 = group2.ElementOfGroups.FirstOrDefault(tb => tb.Id == list[i].IdElement1 || tb.Id == list[i].IdElement2);
 
-                    if (elem1.NumGroup != elem2.NumGroup)
-                        correctly = false;                    
+                    if (elem1.RatioNumeri != elem2.RatioNumeri)
+                        correctly = false;
                 }
                 responseUsers[responseIndex].Correctly = correctly;
             }
-
+            else
+                responseUsers[responseIndex].Correctly = false;
         }
         public static void SaveChangesMatchTheValue(int idQuestion, List<ItemMatchTheValue> element)
         {
@@ -227,22 +243,24 @@ namespace EntranseTesting.Models
                 bool correctly = true;
                 List<UserResponseMatchTheValue> list = responseUsers[responseIndex].UserResponseMatchTheValues.ToList();
 
-                for(int i = 0; i < list.Count;i++)
+                for (int i = 0; i < list.Count; i++)
                 {
                     var item = _list.FirstOrDefault(tb => tb.Id == list[i].IdElement1);
                     var elem1 = item.RatioOfElementEqualityIdElement1Navigations.FirstOrDefault();
                     var elem2 = item.RatioOfElementEqualityIdElement2Navigations.FirstOrDefault();
-                    if(elem1 != null)
+                    if (elem1 != null)
                     {
                         correctly = (elem1.IdElement1 == list[i].IdElement1 && elem1.IdElement2 == list[i].IdElement2) || (elem1.IdElement2 == list[i].IdElement1 && elem1.IdElement1 == list[i].IdElement2);
                     }
-                    else if(elem2 != null)
+                    else if (elem2 != null)
                     {
                         correctly = (elem2.IdElement1 == list[i].IdElement1 && elem2.IdElement2 == list[i].IdElement2) || (elem2.IdElement2 == list[i].IdElement1 && elem2.IdElement1 == list[i].IdElement2);
                     }
                 }
                 responseUsers[responseIndex].Correctly = correctly;
             }
+            else
+                responseUsers[responseIndex].Correctly = false;
         }
     }
 }

@@ -83,7 +83,7 @@
                     HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
 
     <Button Content="{Binding TestMain.TestPages.ButtonValue}"
-            Command="{Binding TestMain.NextQuestion}"
+            Command="{Binding NextQuestion}"
             Grid.Row="4" Grid.ColumnSpan="2"
             HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
             HorizontalAlignment="Right" VerticalAlignment="Bottom"/>

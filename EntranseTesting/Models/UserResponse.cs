@@ -26,4 +26,6 @@ public partial class UserResponse
     public virtual ICollection<UserResponseMatchTheElement> UserResponseMatchTheElements { get; set; } = new List<UserResponseMatchTheElement>();
 
     public virtual ICollection<UserResponseMatchTheValue> UserResponseMatchTheValues { get; set; } = new List<UserResponseMatchTheValue>();
+
+    public virtual ICollection<UserResponseMultiplyAnswer> UserResponseMultiplyAnswers { get; set; } = new List<UserResponseMultiplyAnswer>();
 }

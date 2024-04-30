@@ -83,8 +83,6 @@ public partial class EntranceTestingContext : DbContext
             entity.Property(e => e.DateOfChanging)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("date_of_changing");
-            entity.Property(e => e.HalfCost).HasColumnName("half_cost");
-            entity.Property(e => e.HalfVisibility).HasColumnName("half_visibility");
             entity.Property(e => e.HintVisibility).HasColumnName("hint_visibility");
             entity.Property(e => e.Raiting3).HasColumnName("raiting3");
             entity.Property(e => e.Raiting4).HasColumnName("raiting4");
@@ -372,7 +370,9 @@ public partial class EntranceTestingContext : DbContext
             entity.Property(e => e.Name)
                 .HasColumnType("character varying")
                 .HasColumnName("name");
-            entity.Property(e => e.Password).HasColumnName("password");
+            entity.Property(e => e.Password)
+                .HasColumnType("character varying")
+                .HasColumnName("password");
         });
 
         modelBuilder.Entity<TextOfPutting>(entity =>
@@ -515,31 +515,27 @@ public partial class EntranceTestingContext : DbContext
 
         modelBuilder.Entity<UserResponseMultiplyAnswer>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("user_response_multiply_answer");
+            entity.HasKey(e => e.Id).HasName("user_response_multiply_answer_pk");
 
-            entity.HasIndex(e => e.Id, "user_response_multiply_answer_unique").IsUnique();
+            entity.ToTable("user_response_multiply_answer");
 
             entity.Property(e => e.Id)
-                .ValueGeneratedOnAdd()
                 .UseIdentityAlwaysColumn()
                 .HasColumnName("id");
             entity.Property(e => e.IdElement).HasColumnName("id_element");
             entity.Property(e => e.IdResponse).HasColumnName("id_response");
             entity.Property(e => e.IdText).HasColumnName("id_text");
 
-            entity.HasOne(d => d.IdElementNavigation).WithMany()
+            entity.HasOne(d => d.IdElementNavigation).WithMany(p => p.UserResponseMultiplyAnswers)
                 .HasForeignKey(d => d.IdElement)
                 .HasConstraintName("user_response_multiply_answer_element_of_putting_fk");
 
-            entity.HasOne(d => d.IdResponseNavigation).WithMany()
+            entity.HasOne(d => d.IdResponseNavigation).WithMany(p => p.UserResponseMultiplyAnswers)
                 .HasForeignKey(d => d.IdResponse)
                 .HasConstraintName("user_response_multiply_answer_user_responses_fk");
 
-            entity.HasOne(d => d.IdTextNavigation).WithMany()
+            entity.HasOne(d => d.IdTextNavigation).WithMany(p => p.UserResponseMultiplyAnswers)
                 .HasForeignKey(d => d.IdText)
-                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("user_response_multiply_answer_text_of_putting_fk");
         });
 

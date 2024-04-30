@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:EntranseTesting.ViewModels"
         xmlns:conv="clr-namespace:EntranseTesting.Converter;assembly=EntranseTesting"
+        xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="500"
@@ -38,12 +39,18 @@
     <Style Selector=":is(TextBlock)">
       <Setter Property="FontFamily" Value="{Binding #MyFont.SelectedValue}"/>
       <Setter Property="FontSize" Value="{Binding #MyFontSize.Value}"/>
+      <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style Selector=":is(ComboBox)">
+      <Setter Property="FontFamily" Value="{Binding #MyFont.SelectedValue}"/>
+      <Setter Property="FontSize" Value="{Binding #MyFontSize.Value}"/>
       <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+      <Setter Property="TextBlock.TextTrimming" Value="CharacterEllipsis"/>
     </Style>
     <Style Selector=":is(TextBox)">
       <Setter Property="FontFamily" Value="{Binding #MyFont.SelectedValue}"/>
       <Setter Property="FontSize" Value="{Binding #MyFontSize.Value}"/>
-      <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+      <Setter Property="TextWrapping" Value="Wrap"/>
     </Style>
     <Style Selector=":is(NumericUpDown)">
       <Setter Property="FontFamily" Value="{Binding #MyFont.SelectedValue}"/>
@@ -53,7 +60,6 @@
     <Style Selector=":is(TimePicker)">
       <Setter Property="FontFamily" Value="{Binding #MyFont.SelectedValue}"/>
       <Setter Property="FontSize" Value="{Binding #MyFontSize.Value}"/>
-      <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
     </Style>
     <Style Selector=":is(Button)">
       <Setter Property="FontFamily" Value="{Binding #MyFont.SelectedValue}"/>
@@ -162,6 +168,20 @@
     </Style>
   </Window.Styles>
 
+  <dialogHost:DialogHost CloseOnClickAway="True"
+                         IsOpen="{Binding IsOpenAuthorization}">
+    <dialogHost:DialogHost.DialogContent>
+      <StackPanel Spacing="15" Margin="15 10">
+        <TextBlock Text="Авторизация" Classes="Header"
+                   HorizontalAlignment="Center"/>
+        <TextBox Width="250" Watermark="Логин" Text="{Binding Login}"/>
+        <TextBox Width="250" Watermark="Пароль" Text="{Binding Password}"
+                 PasswordChar="*"/>
+        <Button Content="Войти" Command="{Binding AuthorizationCommand}"
+                HorizontalAlignment="Center"/>
+      </StackPanel> 
+    </dialogHost:DialogHost.DialogContent>
+    
   <SplitView IsPaneOpen="{Binding IsPaneOpen}"
              CompactPaneLength="50"
              OpenPaneLength="300"
@@ -178,7 +198,7 @@
                       VerticalAlignment="Top">
 
             <!-- // Кнопка Авторизация //-->
-            <Button Command="{Binding AuthorizationCommand}" Classes="icon"
+            <Button Command="{Binding OpenAuthorizationCommand}" Classes="icon"
                     IsVisible="{Binding IsAuth}" HorizontalAlignment="Stretch"
                     Tag="{StaticResource PersonRegular}" Content="Авторизироваться"
                     ToolTip.Tip="Авторизироваться в системе"
@@ -257,6 +277,16 @@
                             TextBlock.TextTrimming="WordEllipsis"
                             HorizontalAlignment="Stretch"/>
                 </StackPanel>
+                <!-- // Сортировка //-->
+                <StackPanel Orientation="Vertical" Margin="5">
+                  <TextBlock Text="Сортировать"
+                             VerticalAlignment="Center"/>
+                  <ComboBox ItemsSource="{Binding EditorPages.TaskMainPage.SortList}"
+                            SelectedItem="{Binding EditorPages.TaskMainPage.SelectedSort}"
+                            WrapSelection="False"
+                            TextBlock.TextWrapping="NoWrap"
+                            HorizontalAlignment="Stretch"/>
+                </StackPanel>
                 <!-- // Те которые включаются в тест //-->
                 <CheckBox Content="Вопросы, включаемые в тест"
                           HorizontalAlignment="Stretch" Margin="5"
@@ -275,31 +305,131 @@
               <ItemsRepeater ItemsSource="{Binding TestMain.TestPages.ProgressButtons}"
                          VerticalAlignment="Stretch" HorizontalAlignment="Center"
                          Margin="5 15" IsVisible="{Binding IsPaneOpen}">
-                  <ItemsRepeater.Layout>
-                    <WrapLayout HorizontalSpacing="5" VerticalSpacing="5" Orientation="Horizontal"/>
-                  </ItemsRepeater.Layout>
-                  <ItemsRepeater.ItemTemplate>
-                    <DataTemplate>
-                      <Button Content="{Binding Num}"
-                              Classes="Progress"
-                              Classes.active="{Binding Active}" Classes.check="{Binding Check}"
-                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TestMain.ClickToQuestion}"
-                              CommandParameter="{Binding Num}"
-                              HorizontalContentAlignment="Center"
-                              VerticalContentAlignment="Center">
-                        <Button.Styles>
-                          <Style Selector=":is(Button).check">
-                            <Setter Property="Background" Value="LightGreen"/>
-                          </Style>
-                          <Style Selector=":is(Button).active">
-                            <Setter Property="Background" Value="#696BFF"/>
-                          </Style>
-                        </Button.Styles>
-                      </Button>
-                    </DataTemplate>
-                  </ItemsRepeater.ItemTemplate>
-                </ItemsRepeater>
+                <ItemsRepeater.Layout>
+                  <WrapLayout HorizontalSpacing="5" VerticalSpacing="5" Orientation="Horizontal"/>
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                  <DataTemplate>
+                    <Button Content="{Binding Num}"
+                            Classes="Progress"
+                            Classes.active="{Binding Active}" Classes.check="{Binding Check}"
+                            Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).TestMain.ClickToQuestion}"
+                            CommandParameter="{Binding Num}"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center">
+                      <Button.Styles>
+                        <Style Selector=":is(Button).check">
+                          <Setter Property="Background" Value="LightGreen"/>
+                        </Style>
+                        <Style Selector=":is(Button).active">
+                          <Setter Property="Background" Value="#696BFF"/>
+                        </Style>
+                      </Button.Styles>
+                    </Button>
+                  </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+              </ItemsRepeater>
             </StackPanel>
+
+            <StackPanel Orientation="Vertical" Spacing="10"
+                        IsVisible="{Binding UserResultVisible}">
+            <!-- Инфо о метках -->
+            <Button Command="{Binding IsClickPainCommand}" Classes="icon"
+                    HorizontalAlignment="Stretch" 
+                 Tag="{StaticResource InfoRegular}" Content="Информация о метках"
+                 Background="Transparent">
+              <ToolTip.Tip>
+                <StackPanel Orientation="Vertical">
+                  <TextBlock Margin="2">
+                    <TextBlock.Inlines>
+                      <Run Text="&#x09;&#x09;" Background="LightGreen"/>
+                      <Run Text=" Правильно "/>
+                    </TextBlock.Inlines>
+                  </TextBlock>
+                  <TextBlock Margin="2">
+                    <TextBlock.Inlines>
+                      <Run Text="&#x09;&#x09;" Background="Yellow"/>
+                      <Run Text=" Частично правильно "/>
+                    </TextBlock.Inlines>
+                  </TextBlock>
+                  <TextBlock Margin="2">
+                    <TextBlock.Inlines>
+                      <Run Text="&#x09;&#x09;" Background="LightGray"/>
+                      <Run Text=" Правильно, но не выбрано"/>
+                    </TextBlock.Inlines>
+                  </TextBlock>
+                  <TextBlock Margin="2">
+                    <TextBlock.Inlines>
+                      <Run Text="&#x09;&#x09;" Background="LightCoral"/>
+                      <Run Text=" Не правильно"/>
+                    </TextBlock.Inlines>
+                  </TextBlock>
+                  <TextBlock Margin="2">
+                    <TextBlock.Inlines>
+                      <Run Text="&#x09;&#x09;" Background="LightSalmon"/>
+                      <Run Text=" Не правильно, но выбрано "/>
+                    </TextBlock.Inlines>
+                  </TextBlock>
+                </StackPanel>
+              </ToolTip.Tip>
+            </Button>
+
+            <!-- Поиск, сортировка в результатах пользователя -->
+            <StackPanel Orientation="Vertical" Spacing="10"
+                        IsVisible="{Binding IsPaneOpen}"                        
+                        Margin="5 0">
+              <StackPanel Orientation="Vertical" Margin="0 0 15 0"
+                          Spacing="5" >
+                <TextBlock Text="Поиск по вопросу"/>
+                <TextBox Text="{Binding UserResult.SearchLine}" HorizontalAlignment="Stretch"/>
+              </StackPanel>
+              <CheckBox IsThreeState="True" IsChecked="{Binding UserResult.CorrectlyVisible}"
+                    Margin="5 0"
+                    ToolTip.Tip="Параметр: Состояние вопроса [Решен/Не решен]">
+                <CheckBox.Styles>
+                  <Style Selector="CheckBox:checked">
+                    <Setter Property="Content" Value="Вопросы с правильным ответом"/>
+                  </Style>
+                  <Style Selector="CheckBox:unchecked">
+                    <Setter Property="Content" Value="Вопрос с не правильным ответом"/>
+                  </Style>
+                  <Style Selector="CheckBox">
+                    <Setter Property="Content" Value="Все вопросы"/>
+                  </Style>
+                </CheckBox.Styles>
+              </CheckBox>
+              <CheckBox IsThreeState="True" IsChecked="{Binding UserResult.ResponseVisible}"
+                        Margin="5 0"
+                        ToolTip.Tip="Параметр: Состояние вопроса [Решен/Пропущен]">
+                <CheckBox.Styles>
+                  <Style Selector="CheckBox:checked">
+                    <Setter Property="Content" Value="Вопросы с ответом"/>
+                  </Style>
+                  <Style Selector="CheckBox:unchecked">
+                    <Setter Property="Content" Value="Пропущенные вопросы"/>
+                  </Style>
+                  <Style Selector="CheckBox">
+                    <Setter Property="Content" Value="Все вопросы"/>
+                  </Style>
+                </CheckBox.Styles>
+              </CheckBox>
+              <CheckBox  IsThreeState="True" IsChecked="{Binding UserResult.HintVisible}"
+                        Margin="5 0"
+                        ToolTip.Tip="Параметр: Состояние подсказки [Использована/Не использована]">
+                <CheckBox.Styles>
+                  <Style Selector="CheckBox:checked">
+                    <Setter Property="Content" Value="Вопросы с применением подсказок"/>
+                  </Style>
+                  <Style Selector="CheckBox:unchecked">
+                    <Setter Property="Content" Value="Вопросы без применения подсказок"/>
+                  </Style>
+                  <Style Selector="CheckBox">
+                    <Setter Property="Content" Value="Все вопросы"/>
+                  </Style>
+                </CheckBox.Styles>
+              </CheckBox>
+            </StackPanel>
+           </StackPanel>
           </StackPanel>
 
         </ScrollViewer>
@@ -320,4 +450,6 @@
                       Name="TestContent"/>
     </SplitView.Content>
   </SplitView>
+
+    </dialogHost:DialogHost>
 </Window>

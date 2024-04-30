@@ -1,8 +1,9 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:dialogHostAvalonia="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
              x:Class="EntranseTesting.App"
              xmlns:local="using:EntranseTesting"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Light">
   <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
   <Application.DataTemplates>
@@ -17,5 +18,7 @@
       </FluentTheme.Palettes>
     </FluentTheme>
     <StyleInclude Source="avares://EntranseTesting/Assets/Icons.axaml"/>
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+    <StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml"/>
   </Application.Styles>
 </Application>

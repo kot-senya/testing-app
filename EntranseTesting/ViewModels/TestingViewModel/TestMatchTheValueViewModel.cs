@@ -13,23 +13,24 @@ using ReactiveUI;
 namespace EntranseTesting.ViewModels
 {
 	public partial class TestMatchTheValueViewModel : ObservableObject
-	{
-        EntranceTestingContext baseConnection = new EntranceTestingContext();
+	{        
         [ObservableProperty] int numberTask;
         [ObservableProperty] string question;
         [ObservableProperty] List<ItemMatchTheValue> elements = new List<ItemMatchTheValue>();
         [ObservableProperty] List<ElementOfEquality> info = new List<ElementOfEquality>();
         [ObservableProperty] List<QuestionImage> qImage = new List<QuestionImage>();
+        [ObservableProperty] List<string> chooseValue = new List<string>();
 
         public TestMatchTheValueViewModel(int numberTask)
         {
+            EntranceTestingContext baseConnection = new EntranceTestingContext();
             this.numberTask = numberTask;
 
             Question = baseConnection.Questions.FirstOrDefault(tb => tb.Id == numberTask).Name;
             QImage = baseConnection.QuestionImages.Where(tb => tb.IdQuestion == numberTask).ToList();
 
-            Info = baseConnection.ElementOfEqualities.Include(tb => tb.RatioOfElementEqualityIdElement1Navigations).Include(tb => tb.RatioOfElementEqualityIdElement2Navigations).ToList();
-
+            Info = baseConnection.ElementOfEqualities.Include(tb => tb.RatioOfElementEqualityIdElement1Navigations).Include(tb => tb.RatioOfElementEqualityIdElement2Navigations).Where(tb => tb.IdQuestion == numberTask).ToList();
+          
             for (int i = 0; i < Info.Count/2; i++)
                 Elements.Add(new ItemMatchTheValue(Info.Select(tb => tb.Name).ToList()));
 

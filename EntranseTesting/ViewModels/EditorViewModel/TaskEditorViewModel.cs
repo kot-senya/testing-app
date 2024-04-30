@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -25,6 +26,7 @@ namespace EntranseTesting.ViewModels
         //элементы страницы
         [ObservableProperty] UserControl? taskUC = null;
         [ObservableProperty] bool editing = false;
+        [ObservableProperty] bool editingCategory = true;
         [ObservableProperty] string header = "";
         [ObservableProperty] List<string> category = ["--", "Выбор ответа", "Упорядочивание элементов", "Соотношение", "Подстановка ответов"];
         [ObservableProperty] List<string> _choseCategory = ["1 правильное значение", "несколько правильных значений"];
@@ -41,8 +43,8 @@ namespace EntranseTesting.ViewModels
         List<QuestionImage> qImage;
         List<QuestionHint> qHint;
         ObservableCollection<ElementOfChoose> chooseElement = new ObservableCollection<ElementOfChoose>();
-        [ObservableProperty] string? nameMatchesGroup1 = "";
-        [ObservableProperty] string? nameMatchesGroup2 = "";
+        [ObservableProperty] Group matchesGroup1 = new Group();
+        [ObservableProperty] Group matchesGroup2 = new Group();
         ObservableCollection<ItemMatch> matchesElement = new ObservableCollection<ItemMatch>();
         ObservableCollection<ItemCAFS> matchesMultiplyElement = new ObservableCollection<ItemCAFS>();
         ObservableCollection<ElementOfArrangement> arrangementElement = new ObservableCollection<ElementOfArrangement>();
@@ -57,7 +59,6 @@ namespace EntranseTesting.ViewModels
             connection.Questions.Add(Q);
             connection.SaveChanges();
         }
-
         public TaskEditorViewModel(int idQuestion)
         {
             EntranceTestingContext baseConnection = new EntranceTestingContext();
@@ -84,7 +85,6 @@ namespace EntranseTesting.ViewModels
 
             loadSettingCategory();
         }
-
         public string SelectedCategory
         {
             get => selectedCategory;
@@ -95,7 +95,6 @@ namespace EntranseTesting.ViewModels
                 OnPropertyChanged("TaskUC");
             }
         }
-
         public string SelectedMatchCategory
         {
             get => selectedMatchCategory;
@@ -144,7 +143,7 @@ namespace EntranseTesting.ViewModels
                     case "Горизонтальное упорядочивание элементов":
                         {
                             ArrangementElement.Clear();
-                            foreach (var item in Q.ElementOfArrangements)
+                            foreach (var item in Q.ElementOfArrangements.OrderBy(tb => tb.Position))
                                 ArrangementElement.Add(item);
                             SelectedArrangmentCategory = "горизонтально";
                             SelectedCategory = "Упорядочивание элементов";
@@ -153,7 +152,7 @@ namespace EntranseTesting.ViewModels
                     case "Вертикальное упорядочивание элементов":
                         {
                             ArrangementElement.Clear();
-                            foreach (var item in Q.ElementOfArrangements)
+                            foreach (var item in Q.ElementOfArrangements.OrderBy(tb => tb.Position))
                                 ArrangementElement.Add(item);
                             SelectedArrangmentCategory = "вертикально";
                             SelectedCategory = "Упорядочивание элементов";
@@ -162,16 +161,16 @@ namespace EntranseTesting.ViewModels
                     case "Соотношение элементов":
                         {
                             MatchesElement.Clear();
-                            Group g1 = Q.Groups.ToList()[0];
-                            Group g2 = Q.Groups.ToList()[1];
-                            List<ElementOfGroup> e1 = g1.ElementOfGroups.ToList();
-                            List<ElementOfGroup> e2 = g2.ElementOfGroups.ToList();
-                            NameMatchesGroup1 = g1.Name;
-                            NameMatchesGroup2 = g2.Name;
+                            MatchesGroup1 = Q.Groups.ToList()[0];
+                            MatchesGroup2 = Q.Groups.ToList()[1];
+                            List<ElementOfGroup> e1 = MatchesGroup1.ElementOfGroups.OrderBy(tb => tb.RatioNumeri).ToList();
+                            List<ElementOfGroup> e2 = MatchesGroup2.ElementOfGroups.OrderBy(tb => tb.RatioNumeri).ToList();
+
                             for (int i = 0; i < e1.Count; i++)
-                                MatchesElement.Add(new ItemMatch(e1[i].Name, e2[i].Name));
+                                MatchesElement.Add(new ItemMatch(e1[i], e2[i]));
                             SelectedMatchCategory = "группы элементов";
                             SelectedCategory = "Соотношение";
+                            EditingCategory = false;
                             break;
                         }
                     case "Соотношение величин":
@@ -180,13 +179,16 @@ namespace EntranseTesting.ViewModels
                             List<ElementOfEquality> e = Q.ElementOfEqualities.ToList();
                             for (int i = 0; i < e.Count; i++)
                             {
-                                RatioOfElementEquality elem = (e[i].RatioOfElementEqualityIdElement1Navigations.Count == 1) ? e[i].RatioOfElementEqualityIdElement1Navigations.First() : e[i].RatioOfElementEqualityIdElement2Navigations.First();
-                                ItemMatch item = new ItemMatch(elem.IdElement1Navigation.Name, elem.IdElement2Navigation.Name);
-                                if (!MatchesElement.Contains(item))
+                                RatioOfElementEquality elem = e[i].RatioOfElementEqualityIdElement1Navigations.FirstOrDefault();
+                                if (elem != null)
+                                {
+                                    ItemMatch item = new ItemMatch(elem.IdElement1Navigation, elem.IdElement2Navigation);
                                     MatchesElement.Add(item);
+                                }
                             }
                             SelectedMatchCategory = "равные величины";
                             SelectedCategory = "Соотношение";
+                            EditingCategory = false;
                             break;
                         }
                     case "Подстановка ответов":
@@ -196,9 +198,9 @@ namespace EntranseTesting.ViewModels
                             for (int i = 0; i < tp.Count; i++)
                             {
                                 List<ElementOfPutting> ep = tp[i].ElementOfPuttings.ToList();
-                                MatchesMultiplyElement.Add(new ItemCAFS(tp[i].Name, ep));
+                                MatchesMultiplyElement.Add(new ItemCAFS(tp[i], ep));
                             }
-                                SelectedCategory = "Подстановка ответов";
+                            SelectedCategory = "Подстановка ответов";
                             break;
                         }
                 }
@@ -400,7 +402,6 @@ namespace EntranseTesting.ViewModels
 #endif
             }
         }
-
         public async void DeleteHintImage(int idImage)
         {
             try
@@ -432,7 +433,6 @@ namespace EntranseTesting.ViewModels
 #endif
             }
         }
-
         public async void DeleteQuestionImage(int idImage)
         {
             try
@@ -463,6 +463,390 @@ namespace EntranseTesting.ViewModels
                 Debug.Write(ex.Message);
 #endif
             }
+        }
+
+        public async void QSaveChanges()
+        {
+            if (Editing)//если редактирование
+            {
+                editSaveChanges();
+            }
+            else//если добавление
+            {
+                bool flag = SelectedCategory == "Соотношение";
+                string mess = "Вы уверены что хотите сохранить вопрос? Некоторые изменения после сохранения будут недоступны.\n Например: \n\t - Изменение категории вопроса;\n\t - Добавление и удаление элементов вопроса" + ((flag) ? ";\n\t - Изменение соотношения." : ".");
+                var result = await MessageBoxManager.GetMessageBoxStandard("", mess, ButtonEnum.YesNo).ShowAsync();
+                switch (result)
+                {
+                    case ButtonResult.Yes:
+                        {
+                            createSaveChanges();
+                            break;
+                        }
+                    default:
+                        break;
+                }
+            }
+
+            if (QHint.Count > 0)
+                hintSaveChanges();
+        }
+        private async void hintSaveChanges()
+        {
+            try
+            {
+                EntranceTestingContext connection = new EntranceTestingContext();
+                int index = 0;
+
+                while(true)
+                {
+                    bool flag = QHint[index].Cost > 0 && (!string.IsNullOrEmpty(QHint[index].IdHintNavigation.Text) || QHint[index].IdHintNavigation.HintImages.Count > 0);
+                    if (flag)
+                    {
+                        connection.QuestionHints.Update(QHint[index]);
+                        index++;
+                    }
+                    if (index == QHint.Count)
+                        break;
+                }
+                connection.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                await MessageBoxManager.GetMessageBoxStandard("", "Во время сохранения подсказок произошла ошибка.", ButtonEnum.Ok).ShowAsync();
+#if DEBUG
+                Debug.Write(ex.Message);
+#endif
+            }
+        }
+
+        private async void editSaveChanges()
+        {
+            try
+            {
+                EntranceTestingContext connection = new EntranceTestingContext();
+                int idCategory = CategoryIdFromSelectedComboBoxItem();
+                if (idCategory != Q.IdCategory)
+                    Q.IdCategory = idCategory;
+                connection.Update(Q);
+                switch (idCategory)
+                {
+                    case 1:
+                    case 2:
+                        {
+                            connection.ElementOfChooses.UpdateRange(ChooseElement);
+                            break;
+                        }
+                    case 3:
+                    case 4:
+                        {
+                            connection.ElementOfArrangements.UpdateRange(ArrangementElement);
+                            break;
+                        }
+                    case 5:
+                        {
+                            foreach (var item in MatchesElement)
+                            {
+                                item.Elem1_e.Name = item.Name1;
+                                item.Elem2_e.Name = item.Name2;
+                                connection.ElementOfEqualities.Update(item.Elem1_e);
+                                connection.ElementOfEqualities.Update(item.Elem2_e);
+                            }
+                            break;
+                        }
+                    case 6:
+                        {
+                            connection.Groups.Update(MatchesGroup1);
+                            connection.Groups.Update(MatchesGroup2);
+                            foreach (var item in MatchesElement)
+                            {
+                                item.Elem1.Name = item.Name1;
+                                item.Elem2.Name = item.Name2;
+                                connection.ElementOfGroups.Update(item.Elem1);
+                                connection.ElementOfGroups.Update(item.Elem2);
+                            }
+                            break;
+                        }
+                    case 7:
+                        {
+                            foreach (var item in MatchesMultiplyElement)
+                            {
+                                item.TP.Name = item.Text;
+                                connection.TextOfPuttings.Update(item.TP);
+                                connection.ElementOfPuttings.UpdateRange(item.ElementEditor);
+                            }
+                            break;
+                        }
+                }
+                connection.SaveChanges();
+                await MessageBoxManager.GetMessageBoxStandard("", "Вопрос успешно обновлен", ButtonEnum.Ok).ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                await MessageBoxManager.GetMessageBoxStandard("", "Во время обновления вопроса возникла ошибка.", ButtonEnum.Ok).ShowAsync();
+#if DEBUG
+                Debug.Write(ex.Message);
+#endif
+            }
+        }
+
+        private async void createSaveChanges()
+        {
+            try
+            {
+                EntranceTestingContext connection = new EntranceTestingContext();
+                int idCategory = CategoryIdFromSelectedComboBoxItem();
+                if (idCategory == -1)
+                {
+                    await MessageBoxManager.GetMessageBoxStandard("", "Вы не выбрали категорию вопроса, дальнейшее сохранение невозможно", ButtonEnum.Ok, Icon.Error).ShowAsync();
+                    return;
+                }
+                Q.IdCategory = idCategory;
+                bool flag = true; //пустые элементы
+                switch (idCategory)
+                {
+                    case 1:
+                    case 2:
+                        {
+                            Q.ElementOfChooses.Clear();
+                            if (string.IsNullOrWhiteSpace(Q.Name))
+                            {
+                                await MessageBoxManager.GetMessageBoxStandard("", "Вы не ввели вопрос. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                return;
+                            }
+                            if (ChooseElement.Count() == 0 || ChooseElement.Where(tb => tb.Name == "").Count() == ChooseElement.Count())
+                            {
+                                await MessageBoxManager.GetMessageBoxStandard("", "Вы не добавили элементы. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                return;
+                            }
+
+                            bool correctly = ChooseElement.Where(tb => tb.Correctly == true).Count() > 0;
+                            if (!correctly)
+                            {
+                                await MessageBoxManager.GetMessageBoxStandard("", "Вы не выбрали ни один правильный ответ. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                return;
+                            }
+                            foreach (var item in ChooseElement)
+                            {
+                                if (!string.IsNullOrWhiteSpace(item.Name))
+                                    Q.ElementOfChooses.Add(item);
+                                else
+                                    flag = false;
+                            }
+                            break;
+                        }
+                    case 3:
+                    case 4:
+                        {
+                            Q.ElementOfArrangements.Clear();
+                            if (string.IsNullOrWhiteSpace(Q.Name))
+                            {
+                                await MessageBoxManager.GetMessageBoxStandard("", "Вы не ввели вопрос. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                return;
+                            }
+                            if (ArrangementElement.Count() == 0 || ArrangementElement.Where(tb => tb.Name == "").Count() == ArrangementElement.Count())
+                            {
+                                await MessageBoxManager.GetMessageBoxStandard("", "Вы не добавили элементы. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                return;
+                            }
+                            //проверка порядка
+                            bool positionFlag = true;
+                            int index = 1;
+                            foreach (var item in ArrangementElement.OrderBy(tb => tb.Position))
+                            {
+                                if (item.Position != index)
+                                    positionFlag = false;
+                                index++;
+                            }
+                            if (!positionFlag)
+                            {
+                                await MessageBoxManager.GetMessageBoxStandard("", "Вы не проставили позиции элементов. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                return;
+                            }
+                            //добавление элементов
+                            Random.Shared.Shuffle(CollectionsMarshal.AsSpan(ArrangementElement.ToList()));
+                            foreach (var item in ArrangementElement)
+                            {
+                                if (!string.IsNullOrWhiteSpace(item.Name))
+                                    Q.ElementOfArrangements.Add(item);
+                                else
+                                    flag = false;
+                            }
+                            break;
+                        }
+                    case 5:
+                        {
+                            if (string.IsNullOrWhiteSpace(Q.Name))
+                            {
+                                await MessageBoxManager.GetMessageBoxStandard("", "Вы не ввели вопрос. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                return;
+                            }
+
+                            if (MatchesElement.Count() == 0 || MatchesElement.Where(tb => tb.Name1 == "" || tb.Name2 == "").Count() == MatchesElement.Count())
+                            {
+                                await MessageBoxManager.GetMessageBoxStandard("", "Вы не добавили варианты соотношения. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                return;
+                            }
+                            //только проверка, запись после подтверждения так как бд корявая и записывать неудобно
+                            foreach (var item in MatchesElement)
+                            {
+                                if (string.IsNullOrWhiteSpace(item.Name1) || string.IsNullOrWhiteSpace(item.Name2))
+                                    flag = false;
+                            }
+                            break;
+                        }
+                    case 6:
+                        {
+                            Q.Groups.Clear();
+                            if (string.IsNullOrWhiteSpace(Q.Name))
+                            {
+                                await MessageBoxManager.GetMessageBoxStandard("", "Вы не ввели вопрос. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                return;
+                            }
+                            if (MatchesElement.Count() == 0 || MatchesElement.Where(tb => tb.Name1 == "" || tb.Name2 == "").Count() == MatchesElement.Count())
+                            {
+                                await MessageBoxManager.GetMessageBoxStandard("", "Вы не добавили варианты соотношения. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                return;
+                            }
+                            if (string.IsNullOrWhiteSpace(MatchesGroup1.Name) || string.IsNullOrWhiteSpace(MatchesGroup2.Name))
+                            {
+                                await MessageBoxManager.GetMessageBoxStandard("", "Вы не заполнили название групп. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                return;
+                            }
+
+                            Group group1 = new Group() { Name = MatchesGroup1.Name };
+                            Group group2 = new Group() { Name = MatchesGroup2.Name };
+                            int index = 1;
+                            foreach (var item in MatchesElement)
+                            {
+                                if (!string.IsNullOrWhiteSpace(item.Name1) && !string.IsNullOrWhiteSpace(item.Name2))
+                                {
+                                    group1.ElementOfGroups.Add(new ElementOfGroup() { Name = item.Name1, RatioNumeri = index });
+                                    group2.ElementOfGroups.Add(new ElementOfGroup() { Name = item.Name2, RatioNumeri = index });
+                                    index++;
+                                }
+                                else
+                                    flag = false;
+
+
+                            }
+                            Q.Groups.Add(group1);
+                            Q.Groups.Add(group2);
+                            break;
+                        }
+                    case 7:
+                        {
+                            Q.TextOfPuttings.Clear();
+                            if (MatchesMultiplyElement.Count() == 0)
+                            {
+                                await MessageBoxManager.GetMessageBoxStandard("", "Вы не добавили варианты соотношения. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                return;
+                            }
+                            bool firstFlag = true;
+                            foreach (var item in MatchesMultiplyElement)
+                            {
+                                if (string.IsNullOrEmpty(item.Text))
+                                {
+                                    flag = (firstFlag) ? true : false;
+                                }
+                                TextOfPutting tp = new TextOfPutting() { Name = item.Text };
+                                bool correctly = item.ElementEditor.Where(tb => tb.Correctly == true).Count() > 0;
+                                if (!correctly)
+                                {
+                                    await MessageBoxManager.GetMessageBoxStandard("", "Вы не выбрали ни один правильный ответ. Сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                                    return;
+                                }
+                                foreach (var elem in item.ElementEditor)
+                                {
+                                    if (!string.IsNullOrWhiteSpace(elem.Name))
+                                        tp.ElementOfPuttings.Add(new ElementOfPutting() { Name = elem.Name, Correctly = elem.Correctly });
+                                    else
+                                        flag = false;
+                                }
+                                Q.TextOfPuttings.Add(tp);
+                                firstFlag = false;
+                            }
+                            break;
+                        }
+                }
+                if (!flag)
+                {
+                    var result = await MessageBoxManager.GetMessageBoxStandard("", "Вы не заполнили все элементы, поэтому  сохранение прервано", ButtonEnum.Ok).ShowAsync();
+                    return;
+                }
+                if (idCategory == 5)
+                {
+                    Q.ElementOfEqualities.Clear();
+                    foreach (var item in MatchesElement)
+                    {
+                        if (!string.IsNullOrWhiteSpace(item.Name1) && !string.IsNullOrWhiteSpace(item.Name2))
+                        {
+                            ElementOfEquality elem1 = new ElementOfEquality() { Name = item.Name1 };
+                            ElementOfEquality elem2 = new ElementOfEquality() { Name = item.Name2 };
+                            Q.ElementOfEqualities.Add(elem1);
+                            Q.ElementOfEqualities.Add(elem2);
+                            connection.Questions.Update(Q);
+                            connection.SaveChanges();
+                            RatioOfElementEquality ratio = new RatioOfElementEquality() { IdElement1 = elem1.Id, IdElement2 = elem2.Id };
+                            connection.RatioOfElementEqualities.Add(ratio);
+                        }
+                    }
+                }
+                else
+                    connection.Questions.Update(Q);
+                connection.SaveChanges();
+                await MessageBoxManager.GetMessageBoxStandard("", "Вопрос успешно сохранен", ButtonEnum.Ok).ShowAsync();
+
+                Editing = true;
+                Header = "Редактирование вопроса";
+            }
+            catch (Exception ex)
+            {
+                await MessageBoxManager.GetMessageBoxStandard("", "Во время добавления вопроса возникла ошибка.", ButtonEnum.Ok).ShowAsync();
+#if DEBUG
+                Debug.Write(ex.Message);
+#endif
+            }
+        }
+        /// <summary>
+        /// Метод для получения Id категории вопроса в зависимости от выбранных значений ComboBox
+        /// </summary>
+        /// <returns></returns>
+        private int CategoryIdFromSelectedComboBoxItem()
+        {
+            switch (SelectedCategory)
+            {
+                case "Выбор ответа":
+                    {
+                        if (SelectedChoseCategory == "1 правильное значение")
+                            return 1;
+                        else
+                            return 2;
+                    }
+                case "Упорядочивание элементов":
+                    {
+                        if (SelectedArrangmentCategory == "горизонтально")
+                            return 3;
+                        else
+                            return 4;
+                        break;
+                    }
+                case "Соотношение":
+                    {
+                        if (SelectedMatchCategory == "группы элементов")
+                            return 6;
+                        else
+                            return 5;
+                        break;
+                    }
+                case "Подстановка ответов":
+                    {
+                        return 7;
+                    }
+                default:
+                    return -1;
+            }
+
         }
     }
 }

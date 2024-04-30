@@ -14,4 +14,6 @@ public partial class ElementOfPutting
     public bool Correctly { get; set; }
 
     public virtual TextOfPutting IdTextNavigation { get; set; } = null!;
+
+    public virtual ICollection<UserResponseMultiplyAnswer> UserResponseMultiplyAnswers { get; set; } = new List<UserResponseMultiplyAnswer>();
 }

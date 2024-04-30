@@ -15,10 +15,6 @@ public partial class AppSetting
 
     public DateTime DateOfChanging { get; set; }
 
-    public int HalfCost { get; set; }
-
-    public bool HalfVisibility { get; set; }
-
     public int Raiting5 { get; set; }
 
     public int Raiting4 { get; set; }

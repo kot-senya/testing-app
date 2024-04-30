@@ -27,6 +27,8 @@
               Classes="menu"/>
       <Button Content="Результаты тестирования"
               Tag="{StaticResource CheckboxCheckedRegular}"
+              IsEnabled="{Binding EditorPages.EnabledResults}"
+              Command="{Binding EditorPages.ClickToUserResultsCommand}"
               Margin="5"
               Classes="menu"/>
     </WrapPanel>

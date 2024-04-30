@@ -1,0 +1,82 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EntranseTesting.ResultMain"
+             x:DataType="vm:MainWindowViewModel"
+             xmlns:vm="using:EntranseTesting.ViewModels">
+
+  <Grid Margin="15 0"
+        RowDefinitions="Auto,*,Auto">
+    <!-- Блок поиска -->
+    <WrapPanel Orientation="Horizontal" Margin="0 5">
+      <!-- // Поиск по группе//-->
+      <StackPanel Orientation="Vertical" Margin="5"
+                  VerticalAlignment="Center">
+        <TextBlock Text="Группа"
+                   VerticalAlignment="Center"/>
+        <TextBox Text="{Binding EditorPages.Results.Group}"
+                 TextBlock.TextWrapping="NoWrap"
+                 Width="250"/>
+      </StackPanel>
+      <!-- // Поиск по имени //-->
+      <StackPanel Orientation="Vertical" Margin="5"
+                  VerticalAlignment="Center">
+        <TextBlock Text="Поиск по ФИО"
+                   VerticalAlignment="Center"/>
+        <TextBox Text="{Binding EditorPages.Results.Fio}"
+                 TextBlock.TextWrapping="NoWrap"
+                 Width="250"/>
+      </StackPanel>
+      <!-- Работа с датой-->
+      <StackPanel Orientation="Vertical"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="С   " Margin="5 0"
+                     VerticalAlignment="Center"/>
+          <CalendarDatePicker SelectedDate="{Binding EditorPages.Results.SelectedStartDate}"
+                              DisplayDateEnd="{Binding #calendarEnd.SelectedDate}"
+                              DisplayDateStart="{Binding EditorPages.Results.StartDate}"
+                              IsTodayHighlighted="True"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+          <TextBlock Text="По" Margin="5 0"
+                     VerticalAlignment="Center"/>
+          <CalendarDatePicker Name="calendarEnd"
+                              SelectedDate="{Binding EditorPages.Results.SelectedEndDate}"
+                              DisplayDateStart="{Binding EditorPages.Results.StartDate}"
+                              DisplayDateEnd="{Binding EditorPages.Results.EndDate}"
+                              IsTodayHighlighted="True"/>
+        </StackPanel>
+      </StackPanel>
+    </WrapPanel>
+
+    <!-- Ответы -->
+    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto" Grid.Row="1">
+      <DataGrid ItemsSource="{Binding EditorPages.Results.Answers}"             
+                IsReadOnly="True">
+        <DataGrid.Columns>
+          <DataGridTemplateColumn>
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
+                <Button Content="Подробнее" Margin="5 0"
+                        HorizontalAlignment="Center"
+                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).ClickToUserResult}"
+                        CommandParameter="{Binding Id}"/>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+          <DataGridTextColumn Header="Группа"  Binding="{Binding UserGroup}"/>
+          <DataGridTextColumn Header="ФИО" Binding="{Binding UserName}"/>
+          <DataGridTextColumn Header="Оценка" Binding="{Binding Raiting}" />
+          <DataGridTextColumn Header="Ответы" Binding="{Binding CountCorrectly}" />
+          <DataGridTextColumn Header="Время" Binding="{Binding Time,StringFormat=hh\\:mm\\:ss}" />
+          <DataGridTextColumn Header="Дата прохождения" Binding="{Binding Date, StringFormat={}{0:d MMMM yyyy&#x0a;HH\\:mm}}"/>
+        </DataGrid.Columns>
+      </DataGrid>
+   </ScrollViewer>
+  </Grid>
+</UserControl>

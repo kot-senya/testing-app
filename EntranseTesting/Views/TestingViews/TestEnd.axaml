@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EntranseTesting.TestEnd"
+             x:DataType="vm:MainWindowViewModel"
+             xmlns:vm="using:EntranseTesting.ViewModels">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="20 0" Background="Transparent" Spacing="5"
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+      
+      <TextBlock Text="Предоставленное время на выполнение теста закончилось"
+                 HorizontalAlignment="Center" Classes="Header"
+                 Margin="0 0 0 15"/>
+      
+     <Button HorizontalAlignment="Right" 
+             Command="{Binding EndTestCommand}" Margin="5"
+             Content="Завершить тест"/>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

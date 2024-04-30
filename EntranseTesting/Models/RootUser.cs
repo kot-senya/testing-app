@@ -11,5 +11,5 @@ public partial class RootUser
 
     public string Login { get; set; } = null!;
 
-    public int? Password { get; set; }
+    public string? Password { get; set; }
 }

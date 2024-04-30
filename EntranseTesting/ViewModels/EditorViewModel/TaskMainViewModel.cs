@@ -24,11 +24,14 @@ namespace EntranseTesting.ViewModels
         string? searchLine = "";
         bool selectedInTest = true;
         string selectedCategory = "Все типы заданий";
+        string selectedSort = "Без сортировки";
         [ObservableProperty] List<String> categoryList = ["Все типы заданий", "Вопрос с 1 вариантом ответа", "Вопрос с несколькими вариантами ответа", "Упорядочивание элементов", "Соотношение величин", "Соотношение элементов", "Подстановка ответов"];
+        [ObservableProperty] List<String> sortList = ["Без сортировки", "Часто встречаемые вопросы", "Мало встречаемые вопросы", "По количеству + ответов", "По количеству - ответов"];
         ObservableCollection<Question> questions = new ObservableCollection<Question>();
 
         public ObservableCollection<Question> Questions { get => questions; set { questions = value; OnPropertyChanged("Questions"); } }
         public string SelectedCategory { get => selectedCategory; set { selectedCategory = value; OnPropertyChanged("SelectedCategory"); filter(); } }
+        public string SelectedSort { get => selectedSort; set { selectedSort = value; OnPropertyChanged("SelectedSort"); filter(); } }
         public string? SearchLine { get => searchLine; set { searchLine = value; OnPropertyChanged("SearchLine"); filter(); } }
         public bool SelectedInTest { get => selectedInTest; set { selectedInTest = value; OnPropertyChanged("SelectedInTest"); filter(); } }
 
@@ -69,32 +72,59 @@ namespace EntranseTesting.ViewModels
         }
         private void filter()
         {
-            Questions.Clear();
-            List<Question> _list = new EntranceTestingContext().Questions
-                .Include(tb => tb.IdCategoryNavigation).ThenInclude(tb => tb.IdOrientationNavigation)
-                .Include(tb => tb.ElementOfChooses)
-                .Include(tb => tb.ElementOfArrangements)
-                .Include(tb => tb.TextOfPuttings).ThenInclude(tb => tb.ElementOfPuttings)
-                .Include(tb => tb.ElementOfEqualities).ThenInclude(tb => tb.RatioOfElementEqualityIdElement1Navigations)
-                .Include(tb => tb.ElementOfEqualities).ThenInclude(tb => tb.RatioOfElementEqualityIdElement2Navigations)
-                .Include(tb => tb.Groups).ThenInclude(tb => tb.ElementOfGroups).ToList();
             try
             {
+                Questions.Clear();
+                List<Question> _list = new EntranceTestingContext().Questions
+                    .Include(tb => tb.IdCategoryNavigation).ThenInclude(tb => tb.IdOrientationNavigation)
+                    .Include(tb => tb.ElementOfChooses)
+                    .Include(tb => tb.ElementOfArrangements)
+                    .Include(tb => tb.TextOfPuttings).ThenInclude(tb => tb.ElementOfPuttings)
+                    .Include(tb => tb.ElementOfEqualities).ThenInclude(tb => tb.RatioOfElementEqualityIdElement1Navigations)
+                    .Include(tb => tb.ElementOfEqualities).ThenInclude(tb => tb.RatioOfElementEqualityIdElement2Navigations)
+                    .Include(tb => tb.Groups).ThenInclude(tb => tb.ElementOfGroups)
+                    .Include(tb => tb.UserResponses).ToList();
+
                 //comboBox wiht typing Question (selected type)
                 if (SelectedCategory != "Все типы заданий" && SelectedCategory != null)
                     _list = _list.Where(tb => tb.IdCategoryNavigation.Name.ToLower().Contains(SelectedCategory.ToLower())).ToList();
                 //search 
                 if (!string.IsNullOrWhiteSpace(SearchLine))
                     _list = _list.Where(tb => tb.FillName.ToLower().Contains(SearchLine.ToLower())).ToList();
-                if(SelectedInTest)
+                if (SelectedInTest)
                     _list = _list.Where(tb => tb.InTest == true).ToList();
-
+                //sort
+                switch (SelectedSort)
+                {
+                    case "Часто встречаемые вопросы":
+                        {
+                            _list = _list.OrderByDescending(tb => tb.CountInResponse).ToList();
+                            break;
+                        }
+                    case "Мало встречаемые вопросы": 
+                        {
+                            _list = _list.OrderBy(tb => tb.CountInResponse).ToList();
+                            break;
+                        }
+                    case "По количеству + ответов": 
+                        {
+                            _list = _list.OrderByDescending(tb => tb.CountCorrectly).ToList();
+                            break;
+                        }
+                    case "По количеству - ответов": 
+                        {
+                            _list = _list.OrderByDescending(tb => tb.UnCountCorrectly).ToList();
+                            break;
+                        }
+                    default:
+                        break;
+                }
 
                 if (_list.Count > 0)
                     foreach (Question q in _list)
                         Questions.Add(q);
                 else
-                    Questions = new ObservableCollection<Question>(); 
+                    Questions = new ObservableCollection<Question>();
             }
             catch (Exception ex)
             {

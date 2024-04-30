@@ -18,9 +18,11 @@ namespace EntranseTesting.ViewModels
         [ObservableProperty] private UserControl editorUC = new TestSettings();
         [ObservableProperty] private TestSettingsViewModel settingsApp;
         [ObservableProperty] private TaskEditorViewModel taskEditorPage;
+        [ObservableProperty] private ResultMainViewModel results;
         [ObservableProperty] private TaskMainViewModel taskMainPage;
         [ObservableProperty] bool enabledSettings = false;
         [ObservableProperty] bool enabledTaskMain = true;
+        [ObservableProperty] bool enabledResults = true;
 
         [ObservableProperty] private bool _editingVisible = false;
 
@@ -35,6 +37,7 @@ namespace EntranseTesting.ViewModels
         {
             EnabledSettings = false;
             EnabledTaskMain = true;
+            EnabledResults = true;
             EditingVisible = false;
             SettingsApp = new TestSettingsViewModel();
             EditorUC = new TestSettings();
@@ -45,38 +48,50 @@ namespace EntranseTesting.ViewModels
         {
             EnabledTaskMain = false;
             EnabledSettings = true;
+            EnabledResults = true;
             EditingVisible = true;
             TaskMainPage = new TaskMainViewModel();
             EditorUC = new TaskMain();
         }
 
         [RelayCommand]
+        private void ClickToUserResults()
+        {
+            EnabledTaskMain = true;
+            EnabledSettings = true;
+            EnabledResults = false;
+            EditingVisible = false;
+            Results = new ResultMainViewModel();
+            EditorUC = new ResultMain();
+        }
+        [RelayCommand]
         private async void SaveSettings()
         {
             try
             {
-                AppSetting _set = SettingsApp.Settings;
-
                 //проверка на пустое начение
-                if (_set is null)
+                if (SettingsApp.Settings is null)
                 {
                     await MessageBoxManager.GetMessageBoxStandard("", "Значение оказалось пустым", ButtonEnum.Ok).ShowAsync();
                     return;
                 }
-
-                //проверяем значения, добавляем то чего не было
-                _set.DateOfChanging = DateTime.Now;
-                if (!_set.HintVisibility)
-                { 
-                    _set.HalfVisibility = false;
-                    _set.CountOfHints = 0;
-                    _set.HalfCost = 0;
+                
+                string mess = checkSetting();
+                if(mess != "")
+                {
+                    var resultat = await MessageBoxManager.GetMessageBoxStandard("", mess, ButtonEnum.OkCancel).ShowAsync();
+                    switch (resultat)
+                    {
+                        case ButtonResult.Ok:
+                            break;
+                        case ButtonResult.Cancel:
+                            return;
+                    }
                 }
-                _set.Id = 0;
-                _set.ResultVisibiliry = true;
+
                 //сохраняем в базе
                 EntranceTestingContext baseConnection = new EntranceTestingContext();
-                baseConnection.AppSettings.Add(_set);
+                baseConnection.AppSettings.Add(SettingsApp.Settings);
                 baseConnection.SaveChanges();
                 await MessageBoxManager.GetMessageBoxStandard("", "Текущие настройки теста сохранены", ButtonEnum.Ok).ShowAsync();
 
@@ -94,5 +109,53 @@ namespace EntranseTesting.ViewModels
             }
 
         }
-   }
+        private string checkSetting()
+        {
+            string mess = "";
+            string erMess = "";
+            AppSetting _set = SettingsApp.Settings;
+            _set.Id = 0;
+            _set.DateOfChanging = DateTime.Now;
+
+            //настройка подсказок
+            if (!_set.HintVisibility)
+            {
+                _set.CountOfHints = 0;
+            }
+            else if (_set.CountOfHints == 0)
+            {
+                mess += "Вы включили функцию подсказок, но количество подсказок = 0. Поэтому функция подсказок отключена\n";
+                _set.HintVisibility = false;
+            }
+            
+            //настройка оценивания
+            if(_set.Raiting5 > _set.CountOfQuestions)
+            {
+                _set.Raiting5 = _set.CountOfQuestions;
+                mess += "Критерии оценивания для оценки 5 изменены, так как количество вопросов было меньше чем количество требуемых баллов\n";
+            }
+            if (_set.Raiting4 >= _set.Raiting5)
+            {
+                _set.Raiting4 = _set.Raiting5 - 1;
+                mess += "Критерии оценивания для оценки 4 изменены, так как количество баллов больше чем для оценки 5\n";
+            }
+            if (_set.Raiting3 >= _set.Raiting4)
+            {
+                _set.Raiting3 = _set.Raiting4 - 1;
+                mess += "Критерии оценивания для оценки 3 изменены, так как количество баллов больше чем для оценки 4\n";
+            }
+
+            //проверка времени для прохождения задания
+            if(_set.Time < new TimeSpan(0,0,45) * _set.CountOfQuestions)
+            {
+                erMess += "Времени, которое выделенно на прохождение данного теста может не хватить.\nРекумендуемое время: " + (new TimeSpan(0, 0, 45) * _set.CountOfQuestions) + " (45 секунд на задание)";
+            }
+
+            SettingsApp.Settings = _set;
+            
+            mess = (mess == "") ? mess : "\tИнформация об изменениях*\n" + mess;
+            erMess = (erMess == "") ? erMess : "\n\tСправочная информация\n" + erMess;
+            return  mess + erMess;
+        }
+    }
 }

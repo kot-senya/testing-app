@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using EntranseTesting.Models;
+using Microsoft.EntityFrameworkCore;
 using ReactiveUI;
 
 namespace EntranseTesting.ViewModels
@@ -26,8 +27,6 @@ namespace EntranseTesting.ViewModels
                     CountOfQuestions = 30,
                     HintVisibility = false,
                     CountOfHints = 0, 
-                    HalfCost = 0,
-                    HalfVisibility = false,
                     Raiting5 = 30,
                     Raiting4 = 23,
                     Raiting3 = 16

@@ -9,13 +9,13 @@ public partial class UserResponseMultiplyAnswer
 
     public int IdResponse { get; set; }
 
-    public int IdElement { get; set; }
+    public int IdText { get; set; }
 
-    public int? IdText { get; set; }
+    public int IdElement { get; set; }
 
     public virtual ElementOfPutting IdElementNavigation { get; set; } = null!;
 
     public virtual UserResponse IdResponseNavigation { get; set; } = null!;
 
-    public virtual TextOfPutting? IdTextNavigation { get; set; }
+    public virtual TextOfPutting IdTextNavigation { get; set; } = null!;
 }

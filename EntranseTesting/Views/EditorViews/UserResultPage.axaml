@@ -1,0 +1,144 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="EntranseTesting.UserResultPage"
+             x:DataType="vm:MainWindowViewModel"
+             xmlns:vm="using:EntranseTesting.ViewModels">
+  <Grid Margin="20 10" RowDefinitions="Auto, Auto, *">
+
+    <WrapPanel HorizontalAlignment="Left" Grid.Row="0" Margin="0 5">
+      <Button Content="К общим результатам" Margin="0 5 10 5"
+              Command="{Binding ClickToAllResult}"/>
+      <TextBlock Text="{Binding UserResult.Session.Date, StringFormat='Сеанс от {0:dd MMMM yyyy HH\\:mm\\:ss}'}"
+                Margin="0 10" Classes="Header2"/>
+    </WrapPanel>
+    <StackPanel Orientation="Vertical" Spacing="5"
+                Grid.Row="1">
+      <!-- Общая информация о пользователе -->
+      <WrapPanel Orientation="Horizontal">
+        <TextBlock Text="{Binding UserResult.Session.UserGroup, StringFormat='Группа: {0}'}"/>
+        <TextBlock Text="{Binding UserResult.Session.UserName, StringFormat='Пользователь: {0}'}" Margin="10 0"/>
+      </WrapPanel>
+      <TextBlock Text="{Binding UserResult.Session.Time, StringFormat='Время: {0:hh\\:mm\\:ss}'}"/>
+      <TextBlock Text="{Binding UserResult.Session.CountHintLine, StringFormat='Подсказки: {0}'}"/>
+      <WrapPanel Orientation="Horizontal">
+        <TextBlock Text="{Binding UserResult.Session.Raiting, StringFormat='Оценка: {0}'}"/>
+        <TextBlock Text="{Binding UserResult.Session.CountCorrectly, StringFormat='({0}'}"
+                   Margin="10 0 0 0"/>
+        <TextBlock Text="{Binding UserResult.Session.ProcentCorrectly, StringFormat=' или {0}%)'}"/>
+      </WrapPanel>
+    </StackPanel>
+
+
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto" Grid.Row="2">
+      <StackPanel Orientation="Vertical">
+        <!-- Цветообозначения -->
+        <Border BorderBrush="#696BFF" BorderThickness="2"
+                Padding="10 5" CornerRadius="5"
+                Margin="0 10">
+          <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock Margin="2">
+              <TextBlock.Inlines>
+                <Run Text="&#x09;&#x09;" Background="LightGreen"/>
+                <Run Text=" Правильно "/>
+              </TextBlock.Inlines>
+            </TextBlock>
+            <TextBlock Margin="2">
+              <TextBlock.Inlines>
+                <Run Text="&#x09;&#x09;" Background="Yellow"/>
+                <Run Text=" Частично правильно "/>
+              </TextBlock.Inlines>
+            </TextBlock>
+            <TextBlock Margin="2">
+              <TextBlock.Inlines>
+                <Run Text="&#x09;&#x09;" Background="LightGray"/>
+                <Run Text=" Правильно, но не выбрано"/>
+              </TextBlock.Inlines>
+            </TextBlock>
+            <TextBlock Margin="2">
+              <TextBlock.Inlines>
+                <Run Text="&#x09;&#x09;" Background="LightCoral"/>
+                <Run Text=" Не правильно"/>
+              </TextBlock.Inlines>
+            </TextBlock>
+            <TextBlock Margin="2">
+              <TextBlock.Inlines>
+                <Run Text="&#x09;&#x09;" Background="LightSalmon"/>
+                <Run Text=" Не правильно, но выбрано "/>
+              </TextBlock.Inlines>
+            </TextBlock>
+          </WrapPanel>
+        </Border>
+
+        <!-- Поиск, сортировка -->
+        <WrapPanel Orientation="Horizontal">
+          <StackPanel Orientation="Vertical" Margin="0 0 15 0"
+                      Spacing="10">
+            <TextBlock Text="Поиск по вопросу"/>
+            <TextBox Text="{Binding  UserResult.SearchLine}" Width="250"/>
+          </StackPanel>
+           <StackPanel Orientation="Vertical" >
+          <CheckBox IsThreeState="True" IsChecked="{Binding UserResult.CorrectlyVisible}"
+                    Margin="5 0"
+                    ToolTip.Tip="Параметр: Состояние вопроса [Решен/Не решен]">
+            <CheckBox.Styles>
+              <Style Selector="CheckBox:checked">
+                <Setter Property="Content" Value="Вопросы с правильным ответом"/>
+              </Style>
+              <Style Selector="CheckBox:unchecked">
+                <Setter Property="Content" Value="Вопрос с не правильным ответом"/>
+              </Style>
+              <Style Selector="CheckBox">
+                <Setter Property="Content" Value="Все вопросы"/>
+              </Style>
+            </CheckBox.Styles>
+          </CheckBox>
+          <CheckBox IsThreeState="True" IsChecked="{Binding UserResult.ResponseVisible}"
+                    Margin="5 0"
+                    ToolTip.Tip="Параметр: Состояние вопроса [Решен/Пропущен]">
+            <CheckBox.Styles>
+              <Style Selector="CheckBox:checked">
+                <Setter Property="Content" Value="Вопросы с ответом"/>
+              </Style>
+              <Style Selector="CheckBox:unchecked">
+                <Setter Property="Content" Value="Пропущенные вопросы"/>
+              </Style>
+              <Style Selector="CheckBox">
+                <Setter Property="Content" Value="Все вопросы"/>
+              </Style>
+            </CheckBox.Styles>
+          </CheckBox>
+          <CheckBox  IsThreeState="True" IsChecked="{Binding UserResult.HintVisible}"
+                    Margin="5 0"
+                    ToolTip.Tip="Параметр: Состояние подсказки [Использована/Не использована]">
+            <CheckBox.Styles>
+              <Style Selector="CheckBox:checked">
+                <Setter Property="Content" Value="Вопросы с применением подсказок"/>
+              </Style>
+              <Style Selector="CheckBox:unchecked">
+                <Setter Property="Content" Value="Вопросы без применения подсказок"/>
+              </Style>
+              <Style Selector="CheckBox">
+                <Setter Property="Content" Value="Все вопросы"/>
+              </Style>
+            </CheckBox.Styles>
+          </CheckBox>
+        </StackPanel>
+        </WrapPanel>
+        
+        <!-- Информация о заданиях -->
+        <ItemsRepeater ItemsSource="{Binding UserResult.ResponseList}">
+          <ItemsRepeater.ItemTemplate>
+            <DataTemplate>
+              <ContentControl Content="{Binding Result}"/>
+            </DataTemplate>
+          </ItemsRepeater.ItemTemplate>
+        </ItemsRepeater>
+      </StackPanel>
+    </ScrollViewer>
+
+  </Grid>
+</UserControl>

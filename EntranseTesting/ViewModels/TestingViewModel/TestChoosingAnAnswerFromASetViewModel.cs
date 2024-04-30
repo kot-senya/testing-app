@@ -33,12 +33,12 @@ namespace EntranseTesting.ViewModels
                 Random.Shared.Shuffle(CollectionsMarshal.AsSpan(_list));
                 Element.Add(new ItemCAFS(text.Name,_list));
             }
-            /*int responseIndex = Response.IndexResponse(numberTask);
-            if (Response.responseUsers[responseIndex].UserResponseMultiplyAnswes.Count() > 0)//если пользователь отвечал
+            int responseIndex = Response.IndexResponse(numberTask);
+            if (Response.responseUsers[responseIndex].UserResponseMultiplyAnswers.Count() > 0)//если пользователь отвечал
             {
                 //заполняем данные
                 List<TextOfPutting> _list = baseConnection.TextOfPuttings.Include(tb => tb.ElementOfPuttings).Where(tb => tb.IdQuestion == numberTask).ToList();
-                List<UserResponseMultiplyAnswer> _response = Response.responseUsers[responseIndex].UserResponseMultiplyAnswes.ToList();
+                List<UserResponseMultiplyAnswer> _response = Response.responseUsers[responseIndex].UserResponseMultiplyAnswers.ToList();
                 for(int i = 0; i < _response.Count; i++)
                 {
                     TextOfPutting t = _list.FirstOrDefault(tb => tb.Id == _response[i].IdText);
@@ -46,7 +46,7 @@ namespace EntranseTesting.ViewModels
                     int index = Element.IndexOf(Element.FirstOrDefault(tb => tb.Text == t.Name));
                     Element[index].SelectedItem = e.Name;
                 }
-            }*/
+            }
         }
         public bool QuestionVisible
         {

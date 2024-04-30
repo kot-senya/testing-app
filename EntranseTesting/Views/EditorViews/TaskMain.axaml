@@ -9,6 +9,7 @@
   <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <Grid Margin="15 10"
           RowDefinitions="Auto,*">
+      <!-- Блок фильтрации, поиска, сортировки -->
       <WrapPanel Orientation="Horizontal">
         <!-- // Поиск //-->
         <StackPanel Orientation="Vertical" Margin="5">
@@ -24,9 +25,17 @@
                      VerticalAlignment="Center"/>
           <ComboBox ItemsSource="{Binding EditorPages.TaskMainPage.CategoryList}"
                     SelectedItem="{Binding EditorPages.TaskMainPage.SelectedCategory}"
-                    TextBlock.TextWrapping="NoWrap"
-                    TextBlock.TextTrimming="WordEllipsis"
-                    Width="250"/>
+                    Width="250" WrapSelection="False"
+                    TextBlock.TextWrapping="NoWrap"/>
+        </StackPanel>
+        <!-- // Сортировка //-->
+        <StackPanel Orientation="Vertical" Margin="5">
+          <TextBlock Text="Сортировать"
+                     VerticalAlignment="Center"/>
+          <ComboBox ItemsSource="{Binding EditorPages.TaskMainPage.SortList}"
+                    SelectedItem="{Binding EditorPages.TaskMainPage.SelectedSort}"
+                    Width="250" WrapSelection="False"
+                    TextBlock.TextWrapping="NoWrap"/>
         </StackPanel>
         <!-- // Те которые включаются в тест //-->
         <CheckBox Content="Вопросы, включаемые в тест"
@@ -39,6 +48,7 @@
                 Content="Добавить вопрос"/>
       </WrapPanel>
 
+      <!-- Вопросы -->
       <ItemsRepeater Grid.Row="1" ItemsSource="{Binding EditorPages.TaskMainPage.Questions}"
                      VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
         <ItemsRepeater.Layout>
@@ -50,18 +60,28 @@
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                     Margin="10 2">
               <StackPanel Orientation="Vertical">
-                <WrapPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                  <Button HorizontalAlignment="Right" Classes="icon"
+                <Grid ColumnDefinitions="*,*">
+                  <!-- Кол-во раз в тесте -->
+                  <ContentControl Content="{Binding AllCountInTest}"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Top"/>
+                  
+                  <Button Grid.Column="1"
+                          HorizontalAlignment="Right" Classes="icon"
                           Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditQuestion}" CommandParameter="{Binding Id}"
                           Tag="{StaticResource DraftsRegular}"
                           Content="Редактировать"/>
-                </WrapPanel>
+                </Grid>
                 <!-- Задание -->
                 <ContentControl Content="{Binding tName}"
                                 HorizontalAlignment="Stretch"/>
                 <!-- Ответ -->
                 <ContentControl Content="{Binding Answer}"
                            HorizontalAlignment="Stretch"/>
+                <!-- Количество + и - ответов -->
+                <ContentControl Content="{Binding CountInTest}"
+                           HorizontalAlignment="Stretch"/>
+                
                 <Button Content="Удалить вопрос" Margin="5"
                         Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).EditorPages.TaskMainPage.DeleteQuestion}" 
                         CommandParameter="{Binding Id}"

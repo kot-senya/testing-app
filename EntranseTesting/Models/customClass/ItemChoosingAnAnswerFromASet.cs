@@ -14,6 +14,7 @@ namespace EntranseTesting.Models
         string text = "";        
         string selectedItem = "--";
         List<string> collectionElement = new List<string>() { "--"};
+        TextOfPutting tP = new TextOfPutting();
         ObservableCollection<ElementOfPutting> elementEditor = new ObservableCollection<ElementOfPutting>();
 
         public ItemCAFS() { }
@@ -22,9 +23,10 @@ namespace EntranseTesting.Models
             Text = _text;
             CollectionElement.AddRange(_collection);
         }
-        public ItemCAFS(string _text, List<ElementOfPutting> _collection)
+        public ItemCAFS(TextOfPutting _text, List<ElementOfPutting> _collection)
         {
-            Text = _text;
+            Text = _text.Name;
+            TP = _text;
             foreach(var item in _collection)
                 ElementEditor.Add(item);
         }
@@ -42,6 +44,8 @@ namespace EntranseTesting.Models
                     return true;
             }
         }
+
+        public TextOfPutting TP { get => tP; set => tP = value; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)

@@ -21,74 +21,6 @@ namespace EntranseTesting.ViewModels
         [ObservableProperty] string? groupUser = "";
         [ObservableProperty] string? nameUser = "";
 
-        // ћетод дл€ изменени€ содержимого страницы теста        
-        public async void NextQuestion()
-        {
-            changeResponse();
-
-            if (TestPages.NumQuestion < TestPages.CountQuestion)
-            {
-                TestPages.ProgressButtons[TestPages.NumQuestion - 1].Active = false;
-                TestPages.NumQuestion++;
-            }
-            else if(TestPages.NumQuestion == TestPages.CountQuestion)//если конец теста
-            {
-                if (TestPages.QuestionsCollection.Count() != TestPages.ProgressButtons.Where(tb => tb.Check == true).Count())
-                {
-                    var result = await MessageBoxManager.GetMessageBoxStandard("", "” вас остались невыполненные задани€ю ¬ы точно хотите закончить?", ButtonEnum.YesNo).ShowAsync();
-                    switch (result)
-                    {
-                        case ButtonResult.Yes:
-                                break;
-                        case ButtonResult.No:
-                                return;
-                    }
-                }
-                changeResponse();//сохран€ем ответ последнего задани€
-                SaveResults();               
-            }
-
-            TestPages.ProgressButtons[TestPages.NumQuestion - 1].Active = true;
-
-            if (TestPages.NumQuestion == TestPages.CountQuestion)
-                TestPages.ButtonValue = "«авершить тест";
-
-            while (!TestPages.TakeProgressButtons.Contains(TestPages.ProgressButtons[TestPages.NumQuestion - 1]))
-            {
-                if (TestPages.NumQuestion > TestPages.TakeProgressButtons.Last().Num)
-                    TestPages.SkipItem++;
-                else
-                    TestPages.SkipItem--;
-            }
-
-            TestPages.changingPage();
-        }
-
-        public async void SaveResults()
-        {
-            try
-            {
-                EntranceTestingContext connection = new EntranceTestingContext();
-                connection.UserSessions.Add(Response.userSession);
-                connection.SaveChanges();
-                for(int i = 0; i < Response.responseUsers.Count; i ++)
-                {
-                    Response.responseUsers[i].IdSession = Response.userSession.Id;
-                    connection.UserResponses.Add(Response.responseUsers[i]);
-                }
-                connection.SaveChanges();
-                //страница итогов
-                TestResults = new TestResultViewModel(null);
-                //UC = new TestResult();
-            }
-            catch (Exception ex)
-            {
-                await MessageBoxManager.GetMessageBoxStandard("", "ѕо какой-то причине не удалось сохранить данные", ButtonEnum.Ok).ShowAsync();
-#if DEBUG
-                Debug.WriteLine(ex.Message);
-#endif
-            }
-        }
         public void ClickToQuestion(int numQuestion)
         {
             changeResponse();
@@ -115,7 +47,6 @@ namespace EntranseTesting.ViewModels
         {
             if (TestPages.QuestionsCollection.Count > 0)
             {
-                Response.change = false;
                 switch (TestPages.QuestionsCollection[TestPages.NumQuestion - 1].IdCategoryNavigation.Name)
                 {
                     case "¬опрос с 1 вариантом ответа":
@@ -146,12 +77,11 @@ namespace EntranseTesting.ViewModels
                         }
                     case "ѕодстановка ответов":
                         {
-                            // Response.SaveChangesCAFS(TestPages.QuestionsCollection[TestPages.NumQuestion - 1].Id, TestPages.TestCAFS.Element);
+                            Response.SaveChangesCAFS(TestPages.QuestionsCollection[TestPages.NumQuestion - 1].Id, TestPages.TestCAFS.Element);
                             break;
                         }
                 }
-                if (Response.change)
-                    TestPages.ProgressButtons[TestPages.NumQuestion - 1].Check = true;
+               TestPages.ProgressButtons[TestPages.NumQuestion - 1].Check = Response.change;
             }
 
         }

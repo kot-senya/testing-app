@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using EntranseTesting.Models;
 using Microsoft.EntityFrameworkCore;
+using MsBox.Avalonia;
 using ReactiveUI;
 
 namespace EntranseTesting.ViewModels
@@ -14,17 +16,18 @@ namespace EntranseTesting.ViewModels
         public TestResultViewModel() { }
         public TestResultViewModel(int? _n)
         {
-            EntranceTestingContext connection = new EntranceTestingContext();
-            session = connection.UserSessions.Include(tb => tb.UserResponses).FirstOrDefault(tb => tb.Id == Response.userSession.Id);
-        }
+            try
+            {
+                EntranceTestingContext connection = new EntranceTestingContext();
+                Session = connection.UserSessions.Include(tb => tb.UserResponses).Include(tb => tb.IdAppSettingsNavigation).FirstOrDefault(tb => tb.Id == Response.userSession.Id);
+            }
+            catch (Exception ex)
+            {
+#if DEBUG
+                Debug.WriteLine("\n\nTestResult\n" + ex.Message);
+#endif
+            }
 
-        public double ProcentCorrectly
-        {
-            get => Math.Round((double)(session.UserResponses.Where(tb => tb.Correctly == true).Count()/ session.UserResponses.Count()),2);
-        }
-        public string CountCorrectly
-        {
-            get => session.UserResponses.Where(tb => tb.Correctly == true).Count() + " / "+ session.UserResponses.Count();
         }
     }
 }

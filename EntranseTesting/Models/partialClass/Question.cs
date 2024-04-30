@@ -143,9 +143,53 @@ namespace EntranseTesting.Models
         {
             get
             {
+                if (UserResponses == null) return false;
                 if (CountInResponse > 0)
                     return false;
                 return true;
+            }
+        }
+
+        [NotMapped]
+        public int CountCorrectly
+        {
+            get => UserResponses.Where(tb => tb.Correctly == true).Count();
+        }
+        [NotMapped]
+        public int UnCountCorrectly
+        {
+            get => UserResponses.Where(tb => tb.Correctly == false).Count();
+        }
+
+        [NotMapped]
+        public TextBlock CountInTest
+        {
+            get
+            {
+                TextBlock tb = new TextBlock();
+                if (UserResponses == null) return tb;
+
+                tb.Inlines.Add(new Run("\nКол-во + ответов: ") { FontWeight = FontWeight.Bold});
+                tb.Inlines.Add(new Run(CountCorrectly.ToString()));
+                tb.Inlines.Add(new Run("\nКол-во - ответов: ") { FontWeight = FontWeight.Bold});
+                tb.Inlines.Add(new Run(UnCountCorrectly.ToString() + "\n"));
+
+                return tb;
+            }
+        }
+
+        [NotMapped]
+        public TextBlock AllCountInTest
+        {
+            get
+            {
+                TextBlock tb = new TextBlock();
+                if (UserResponses == null) return tb;
+
+                tb.Inlines.Add(new Run("\nКол-во ответов на вопрос: ") { FontWeight = FontWeight.Bold });
+                tb.Inlines.Add(new Run(CountInResponse.ToString() + "\n"));
+
+                return tb;
             }
         }
     }

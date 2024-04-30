@@ -26,8 +26,8 @@
               <TextBlock Text="Количество вопросов"
                          VerticalAlignment="Center"
                          Margin="5 0"/>
-              <NumericUpDown Value="{Binding EditorPages.SettingsApp.Settings.CountOfQuestions}"
-                             Minimum="0" Maximum="{Binding EditorPages.SettingsApp.CountQuestion}"
+              <NumericUpDown Value="{Binding EditorPages.SettingsApp.Settings.CountOfQuestions, TargetNullValue=0}"
+                             Minimum="5" Maximum="{Binding EditorPages.SettingsApp.CountQuestion}"
                              Margin="5 0"/>
             </WrapPanel>
 
@@ -39,6 +39,10 @@
                           MinuteIncrement="5"
                           Margin="5 0"/>
             </WrapPanel>
+
+            <CheckBox Content="Показать результат теста"
+                      IsChecked="{Binding EditorPages.SettingsApp.Settings.ResultVisibiliry}"
+                      Margin="5 0"/>
 
             <CheckBox Name="HintVisibility"
                       Content="Включить подсказки в тест"
@@ -53,27 +57,10 @@
                          ToolTip.Tip="{Binding Mess.ToolTipHintCount}" ToolTip.Placement="Right"
                          Margin="5 0"/>
               <NumericUpDown Name="nCountOfHints"
-                             Value="{Binding EditorPages.SettingsApp.Settings.CountOfHints}"
+                             Value="{Binding EditorPages.SettingsApp.Settings.CountOfHints, TargetNullValue=0}"
                              Minimum="0" Maximum="1000"
                              Margin="5 0"/>
-            </WrapPanel>
-
-            <CheckBox Name="HalfVisibility"
-                      Content="Включить 50/50 в тест"
-                      Margin="5 0"
-                      IsChecked="{Binding EditorPages.SettingsApp.Settings.HalfVisibility}"
-                      IsVisible="{Binding #HintVisibility.IsChecked}"
-                      ToolTip.Tip="{Binding Mess.ToolTipHalfCost}" ToolTip.Placement="Right"/>
-
-            <WrapPanel Orientation="Horizontal"
-                        IsVisible="{Binding #HalfVisibility.IsChecked}">
-              <TextBlock Text="Количество очков за 50/50*"
-                         ToolTip.Tip="{Binding Mess.ToolTipHalfCost}" ToolTip.Placement="Right"
-                         VerticalAlignment="Center"
-                         Margin="5 0"/>
-              <NumericUpDown Value="{Binding EditorPages.SettingsApp.Settings.HalfCost}"
-                             Minimum="0" Maximum="{Binding Value, ElementName=nCountOfHints}"/>
-            </WrapPanel>
+            </WrapPanel>            
           </StackPanel>
         </Border>
 
@@ -94,7 +81,7 @@
                          VerticalAlignment="Center"
                          Margin="5 0"/>
               <NumericUpDown Name="Raiting5"
-                             Value="{Binding EditorPages.SettingsApp.Settings.Raiting5}"
+                             Value="{Binding EditorPages.SettingsApp.Settings.Raiting5, TargetNullValue=0}"
                              Minimum="0" Maximum="{Binding EditorPages.SettingsApp.CountQuestion}"
                              Margin="5 0"/>
             </WrapPanel>
@@ -104,7 +91,7 @@
                          VerticalAlignment="Center"
                          Margin="5 0"/>
               <NumericUpDown Name="Raiting4"
-                             Value="{Binding EditorPages.SettingsApp.Settings.Raiting4}"
+                             Value="{Binding EditorPages.SettingsApp.Settings.Raiting4, TargetNullValue=0}"
                              Minimum="0" Maximum="{Binding #Raiting5.Value}"
                              Margin="5 0"/>
             </WrapPanel>
@@ -113,9 +100,8 @@
               <TextBlock Text="Оценка 3"
                          VerticalAlignment="Center"
                          Margin="5 0"/>
-              <NumericUpDown Value="{Binding EditorPages.SettingsApp.Settings.Raiting3}"
-                             Minimum="0" Maximum="{Binding #Raiting4.Value}"
-                             Margin="5 0"/>
+              <NumericUpDown Value="{Binding EditorPages.SettingsApp.Settings.Raiting3, TargetNullValue='0'}"
+                             Minimum="0" Maximum="{Binding #Raiting4.Value}" Margin="5 0"/>
             </WrapPanel>
 
           </StackPanel>

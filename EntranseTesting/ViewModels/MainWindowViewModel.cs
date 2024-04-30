@@ -31,12 +31,14 @@ namespace EntranseTesting.ViewModels
         //основные элементы окна 
         [ObservableProperty] private UserControl uC = new TestMain();
         [ObservableProperty] private bool _isPaneOpen = false;
+        [ObservableProperty] private bool _isOpenAuthorization = false;
         [ObservableProperty] private bool _isTextChangeOpen = false;
         [ObservableProperty] private bool _isHintOpen = false;
         [ObservableProperty] private bool _textChangeVisible = false;
         [ObservableProperty] private bool _hintVisible = false;
         [ObservableProperty] private bool _info = true;
         [ObservableProperty] private bool _buttonVisible = false;
+        [ObservableProperty] private bool _userResultVisible = false;
 
         //локальные классы для работы
         [ObservableProperty] InterfaceSettings iS = new InterfaceSettings();//пользовательский интерфейс
@@ -45,11 +47,17 @@ namespace EntranseTesting.ViewModels
         //view model для работы с основными user control
         [ObservableProperty] TestMainViewModel testMain = new TestMainViewModel();
         [ObservableProperty] EditorPageViewModel editorPages = new EditorPageViewModel(false);
+        [ObservableProperty] UserResultViewModel userResult;
 
         //кнопки панели
         [ObservableProperty] bool isAuth = true;
         [ObservableProperty] bool isExit = false;
+        private bool timerEnd = false;
+        private bool reSave = false;
 
+        //для авторизации
+        [ObservableProperty] string login = "";
+        [ObservableProperty] string password = "";
 
         [RelayCommand]
         private void IsClickPain()
@@ -105,12 +113,17 @@ namespace EntranseTesting.ViewModels
                     Response.userSession = new UserSession()
                     {
                         Date = DateTime.Now,
-                        Time = new TimeOnly(0, 0),
-                        UserGroup = TestMain.GroupUser.ToString(),
+                        Time = new TimeSpan(0, 0, 0),
+                        UserGroup = TestMain.GroupUser.Replace(" ", "").ToString(),
                         UserName = TestMain.NameUser.ToString(),
                         CountHint = 0,
                         IdAppSettings = TestMain.TestPages.SettingTest.Id
                     };
+                    Response.timer.Interval = TestMain.TestPages.SettingTest.Time;
+                    Response.timer.Tick += stopTimer;
+                    Response.timer.Start();
+                    timerEnd = false;
+                    reSave = false;
                 }
                 else
                 {
@@ -122,27 +135,44 @@ namespace EntranseTesting.ViewModels
             {
                 await MessageBoxManager.GetMessageBoxStandard("Ошибка формы", "Возникла неопознаная ошибка. Возможно вы сделали сто-то не так", ButtonEnum.Ok).ShowAsync();
             }
-
         }
 
-
-        [RelayCommand]
-        private void Authorization()
+        private void stopTimer(object? sender, EventArgs e)
         {
-            Info = false;
-            IsHintOpen = false;
-            HintVisible = false;
+            timerEnd = true;
+            SaveResults();
+        }
+        [RelayCommand]
+        private void OpenAuthorization()
+        {
+            IsOpenAuthorization = true;
+        }
+        [RelayCommand]
+        private async void Authorization()
+        {
+            EntranceTestingContext connection = new EntranceTestingContext();
+            RootUser user = connection.RootUsers.FirstOrDefault(tb => tb.Login == Login && tb.Password == Password);
+            if (user != null)
+            {
+                Info = false;
+                IsHintOpen = false;
+                HintVisible = false;
+                IsOpenAuthorization = false;
 
-            IsAuth = false;
-            IsExit = true;
-            EditorPages = new EditorPageViewModel(false);
-            UC = new EditorPage();
+                IsAuth = false;
+                IsExit = true;
+                EditorPages = new EditorPageViewModel(false);
+                UC = new EditorPage();
+            }
+            else
+                await MessageBoxManager.GetMessageBoxStandard("", "Пользователь не найден").ShowAsync();
+
         }
 
         [RelayCommand]
         private async void ToBack()
         {
-            if(typeof(TaskEditor)== UC.GetType())
+            if (typeof(TaskEditor) == UC.GetType())
             {
                 try
                 {
@@ -154,9 +184,19 @@ namespace EntranseTesting.ViewModels
                                 if (EditorPages.TaskEditorPage.Header == "Добавление вопроса")
                                 {
                                     EntranceTestingContext connection = new EntranceTestingContext();
-                                    Question q = connection.Questions.FirstOrDefault(tb => tb.Id == EditorPages.TaskEditorPage.Q.Id);
-                                    connection.Questions.Remove(q);
-                                    connection.SaveChanges();
+                                    Question q = connection.Questions
+                                    .Include(tb => tb.ElementOfArrangements)
+                                    .Include(tb => tb.ElementOfEqualities)
+                                    .Include(tb => tb.ElementOfChooses)
+                                    .Include(tb => tb.TextOfPuttings)
+                                    .Include(tb => tb.Groups)
+                                    .FirstOrDefault(tb => tb.Id == EditorPages.TaskEditorPage.Q.Id);
+                                    bool flag = q.ElementOfArrangements.Count == 0 && q.ElementOfEqualities.Count == 0 && q.ElementOfChooses.Count == 0 && q.TextOfPuttings.Count == 0 && q.Groups.Count == 0;
+                                    if (flag)
+                                    {
+                                        connection.Questions.Remove(q);
+                                        connection.SaveChanges();
+                                    }
                                 }
                                 break;
                             }
@@ -177,7 +217,7 @@ namespace EntranseTesting.ViewModels
             {
                 EditorPages.EditingVisible = false;
             }
-            if (typeof(TestPage) == UC.GetType()) 
+            if (typeof(TestPage) == UC.GetType())
             {
                 var result = await MessageBoxManager.GetMessageBoxStandard("Выход из теста", "Если вы выйдите из теста, то результат не сохраниться", ButtonEnum.YesNo).ShowAsync();
                 switch (result)
@@ -192,10 +232,14 @@ namespace EntranseTesting.ViewModels
                         }
                 }
                 ButtonVisible = false;
+                Response.timer.Stop();
             }
+            Login = "";
+            Password = "";
             Info = true;
             IsAuth = true;
             IsExit = false;
+            UserResultVisible = false;
             TestMain = new TestMainViewModel();
             UC = new TestMain();
         }
@@ -226,9 +270,19 @@ namespace EntranseTesting.ViewModels
                             if (EditorPages.TaskEditorPage.Header == "Добавление вопроса")
                             {
                                 EntranceTestingContext connection = new EntranceTestingContext();
-                                Question q = connection.Questions.FirstOrDefault(tb => tb.Id == EditorPages.TaskEditorPage.Q.Id);
-                                connection.Questions.Remove(q);
-                                connection.SaveChanges();
+                                Question q = connection.Questions
+                                    .Include(tb => tb.ElementOfArrangements)
+                                    .Include(tb => tb.ElementOfEqualities)
+                                    .Include(tb => tb.ElementOfChooses)
+                                    .Include(tb => tb.TextOfPuttings)
+                                    .Include(tb => tb.Groups)
+                                    .FirstOrDefault(tb => tb.Id == EditorPages.TaskEditorPage.Q.Id);
+                                bool flag = q.ElementOfArrangements.Count == 0 && q.ElementOfEqualities.Count == 0 && q.ElementOfChooses.Count == 0 && q.TextOfPuttings.Count == 0 && q.Groups.Count == 0;
+                                if (flag)
+                                {
+                                    connection.Questions.Remove(q);
+                                    connection.SaveChanges();
+                                }
                             }
                             EditorPages.EditingVisible = true;
                             EditorPages = new EditorPageViewModel(true);
@@ -323,6 +377,114 @@ namespace EntranseTesting.ViewModels
             }
         }
 
+        // Метод для изменения содержимого страницы теста        
+        public async void NextQuestion()
+        {
+            TestMain.changeResponse();
+
+            if (TestMain.TestPages.NumQuestion < TestMain.TestPages.CountQuestion)
+            {
+                TestMain.TestPages.ProgressButtons[TestMain.TestPages.NumQuestion - 1].Active = false;
+                TestMain.TestPages.NumQuestion++;
+            }
+            else if (TestMain.TestPages.NumQuestion == TestMain.TestPages.CountQuestion)//если конец теста
+            {
+                if (TestMain.TestPages.QuestionsCollection.Count() != TestMain.TestPages.ProgressButtons.Where(tb => tb.Check == true).Count())
+                {
+                    var result = await MessageBoxManager.GetMessageBoxStandard("", "У вас остались невыполненные заданияю Вы точно хотите закончить?", ButtonEnum.YesNo).ShowAsync();
+                    switch (result)
+                    {
+                        case ButtonResult.Yes:
+                            break;
+                        case ButtonResult.No:
+                            return;
+                    }
+                }
+                SaveResults();
+            }
+
+            TestMain.TestPages.ProgressButtons[TestMain.TestPages.NumQuestion - 1].Active = true;
+
+            if (TestMain.TestPages.NumQuestion == TestMain.TestPages.CountQuestion)
+                TestMain.TestPages.ButtonValue = "Завершить тест";
+
+            while (!TestMain.TestPages.TakeProgressButtons.Contains(TestMain.TestPages.ProgressButtons[TestMain.TestPages.NumQuestion - 1]))
+            {
+                if (TestMain.TestPages.NumQuestion > TestMain.TestPages.TakeProgressButtons.Last().Num)
+                    TestMain.TestPages.SkipItem++;
+                else
+                    TestMain.TestPages.SkipItem--;
+            }
+
+            TestMain.TestPages.changingPage();
+        }
+        public async void SaveResults()
+        {
+            if (reSave) return;
+            try
+            {
+                ButtonVisible = false;
+                TestMain.changeResponse();//сохраняем ответ последнего задания
+                EntranceTestingContext connection = new EntranceTestingContext();
+                Response.userSession.Time = DateTime.Now.TimeOfDay - Response.userSession.Date.TimeOfDay;
+                Response.userSession.UserGroup = Response.userSession.UserGroup.ToUpper().Trim();
+                Response.userSession.UserName = Response.userSession.UserName.Trim();
+                Response.userSession.CountHint = TestMain.TestPages.HintCount;
+                connection.UserSessions.Add(Response.userSession);
+                connection.SaveChanges();
+                for (int i = 0; i < Response.responseUsers.Count; i++)
+                {
+                    Response.responseUsers[i].IdSession = Response.userSession.Id;
+                    connection.UserResponses.Add(Response.responseUsers[i]);
+                }
+                connection.SaveChanges();
+
+                reSave = true;
+                if (timerEnd)
+                {
+                    UC = new TestEnd();
+                }
+                else
+                {
+                    Response.timer.Stop();
+                    EndTest();
+                }
+            }
+            catch (Exception ex)
+            {
+                await MessageBoxManager.GetMessageBoxStandard("", "По какой-то причине не удалось сохранить данные", ButtonEnum.Ok).ShowAsync();
+#if DEBUG
+                Debug.WriteLine(ex.Message);
+#endif
+            }
+        }
+        [RelayCommand]
+        private void EndTest()
+        {
+            //страница итогов
+            if (TestMain.TestPages.SettingTest.ResultVisibiliry)
+            {
+                TestMain.TestResults = new TestResultViewModel(null);
+                UC = new TestResult();
+            }
+            else
+            {
+                TestMain = new TestMainViewModel();
+                UC = new TestMain();
+            }
+        }
+
+        public void ClickToUserResult(int idSession)
+        {
+            UserResultVisible = true;
+            UserResult = new UserResultViewModel(idSession);
+            UC = new UserResultPage();
+        }
+        public void ClickToAllResult()
+        {
+            UserResultVisible = false;
+            UC = new EditorPage();
+        }
     }
 }
 

@@ -39,7 +39,6 @@ namespace EntranseTesting.ViewModels
             {
                 //заполняем данные
                 List<ElementOfArrangement> _list = baseConnection.ElementOfArrangements.Where(tb => tb.IdQuestion == numberTask).ToList();
-                Random.Shared.Shuffle(CollectionsMarshal.AsSpan(_list));
                 foreach (ElementOfArrangement elem in _list)
                     Element.Add(elem);
                 int i = 1;

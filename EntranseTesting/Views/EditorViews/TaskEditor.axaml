@@ -17,6 +17,7 @@
                  HorizontalAlignment="Center"
                  Grid.Column="1" Classes="Header"/>
       <Button Content="Сохранить"
+              Command="{Binding EditorPages.TaskEditorPage.QSaveChanges}"
               Grid.Column="2"/>
     </Grid>
     <ScrollViewer Grid.Row="1"
@@ -43,6 +44,7 @@
                 <TextBlock Text="Текст"
                            VerticalAlignment="Center"/>
                 <TextBox Text="{Binding EditorPages.TaskEditorPage.Q.Name}"
+                         AcceptsReturn="True"
                          HorizontalContentAlignment="Stretch"
                          HorizontalAlignment="Stretch"
                          Width="450" Height="150"/>
@@ -112,6 +114,7 @@
                         <TextBlock Text="Текст"
                                    VerticalAlignment="Center"/>
                         <TextBox Text="{Binding IdHintNavigation.Text}"
+                                 AcceptsReturn="True"
                                  HorizontalContentAlignment="Stretch"
                                  HorizontalAlignment="Stretch"
                                  Width="350" Height="200"/>

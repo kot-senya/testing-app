@@ -11,6 +11,7 @@
       <StackPanel Orientation="Vertical" Spacing="5">
         <TextBlock Text="Вид соотношения" VerticalAlignment="Center"/>
         <ComboBox Width="450"
+                  IsEnabled="{Binding EditorPages.TaskEditorPage.EditingCategory}"
                   ItemsSource="{Binding EditorPages.TaskEditorPage.MatchCategory}"
                   SelectedItem="{Binding EditorPages.TaskEditorPage.SelectedMatchCategory}"/>
       </StackPanel>
@@ -27,19 +28,19 @@
           <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Vertical" Spacing="5" Grid.Column="1">
+        <StackPanel Orientation="Vertical" Spacing="5" Grid.Column="1"
+                    IsVisible="{Binding EditorPages.TaskEditorPage.SelectedGroup}">
           <TextBlock Text="Группа 1" VerticalAlignment="Center"
                      HorizontalAlignment="Center" Width="350"/>
-          <TextBox Width="350"
-                   IsVisible="{Binding EditorPages.TaskEditorPage.SelectedGroup}"
-                   Text="{Binding EditorPages.TaskEditorPage.NameMatchesGroup1}"/>
+          <TextBox Width="350"                   
+                   Text="{Binding EditorPages.TaskEditorPage.MatchesGroup1.Name}"/>
         </StackPanel>
-        <StackPanel Orientation="Vertical" Spacing="5" Grid.Column="3">
+        <StackPanel Orientation="Vertical" Spacing="5" Grid.Column="3"
+                    IsVisible="{Binding EditorPages.TaskEditorPage.SelectedGroup}">
           <TextBlock Text="Группа 2" VerticalAlignment="Center"
                      HorizontalAlignment="Center" Width="350"/>
-          <TextBox Width="350"
-                   IsVisible="{Binding EditorPages.TaskEditorPage.SelectedGroup}"
-                   Text="{Binding EditorPages.TaskEditorPage.NameMatchesGroup1}"/>
+          <TextBox Width="350"                  
+                   Text="{Binding EditorPages.TaskEditorPage.MatchesGroup2.Name}"/>
         </StackPanel>
 
         <TextBlock Text="Элементы" VerticalAlignment="Center"
