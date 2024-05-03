@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using EntranseTesting.Models;
 using Microsoft.EntityFrameworkCore;
@@ -18,13 +19,21 @@ namespace EntranseTesting.ViewModels
         [ObservableProperty]DateTime startDate = DateTime.Today;
         DateTime selectedEndDate = DateTime.Today;
         DateTime selectedStartDate = DateTime.Today;
-
+        [ObservableProperty] DispatcherTimer timer = new DispatcherTimer();
 
         public ResultMainViewModel()
         {
             EntranceTestingContext connection = new EntranceTestingContext();            
             StartDate = connection.UserSessions.OrderBy(tb => tb.Date).ToList().First().Date;
             SelectedStartDate = StartDate;
+            filter();
+            timer.Interval = new TimeSpan(0, 1, 30);
+            timer.Tick += restart;
+            timer.Start();
+        }
+
+        private void restart(object? sender, EventArgs e)
+        {
             filter();
         }
 

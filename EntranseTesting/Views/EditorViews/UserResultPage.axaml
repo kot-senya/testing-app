@@ -29,6 +29,7 @@
                    Margin="10 0 0 0"/>
         <TextBlock Text="{Binding UserResult.Session.ProcentCorrectly, StringFormat=' или {0}%)'}"/>
       </WrapPanel>
+      <ContentControl Content="{Binding UserResult.Session.AnswerRaiting}"/>
     </StackPanel>
 
 

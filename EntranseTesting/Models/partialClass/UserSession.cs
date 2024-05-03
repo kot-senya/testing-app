@@ -59,5 +59,25 @@ namespace EntranseTesting.Models
                 return "Потрачено " + CountHint + " очков";
             }
         }
+
+        [NotMapped]
+        public TextBlock AnswerRaiting
+        {
+            get
+            {
+                string value = "";
+                if (IdAppSettingsNavigation != null)
+                {
+                    value += "Оценка 5: с " + IdAppSettingsNavigation.Raiting5 + " б.\n";
+                    value += "Оценка 4: с " + IdAppSettingsNavigation.Raiting4 + "б. по " + (IdAppSettingsNavigation.Raiting5 - 1) + "б.\n";
+                    value += "Оценка 3: с " + IdAppSettingsNavigation.Raiting3 + "б. по " + (IdAppSettingsNavigation.Raiting4 - 1) + "б.\n";
+                }
+                else
+                    value = "Не определены параметры оценивания";
+                TextBlock tb = new TextBlock();
+                tb.Text = value;
+                return tb;
+            }
+        }
     }
 }

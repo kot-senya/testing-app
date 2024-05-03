@@ -57,7 +57,10 @@
     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto" Grid.Row="1">
       <DataGrid ItemsSource="{Binding EditorPages.Results.Answers}"             
-                IsReadOnly="True">
+                IsReadOnly="True"
+                CanUserResizeColumns="True"
+                CanUserReorderColumns="True"
+                CanUserSortColumns="True">
         <DataGrid.Columns>
           <DataGridTemplateColumn>
             <DataGridTemplateColumn.CellTemplate>
@@ -71,7 +74,17 @@
           </DataGridTemplateColumn>
           <DataGridTextColumn Header="Группа"  Binding="{Binding UserGroup}"/>
           <DataGridTextColumn Header="ФИО" Binding="{Binding UserName}"/>
-          <DataGridTextColumn Header="Оценка" Binding="{Binding Raiting}" />
+          <DataGridTemplateColumn Header="Оценка">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Raiting}"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Cursor="Help"
+                           ToolTip.Tip="{Binding AnswerRaiting}"/>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
           <DataGridTextColumn Header="Ответы" Binding="{Binding CountCorrectly}" />
           <DataGridTextColumn Header="Время" Binding="{Binding Time,StringFormat=hh\\:mm\\:ss}" />
           <DataGridTextColumn Header="Дата прохождения" Binding="{Binding Date, StringFormat={}{0:d MMMM yyyy&#x0a;HH\\:mm}}"/>

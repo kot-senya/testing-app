@@ -39,6 +39,7 @@ namespace EntranseTesting.ViewModels
             EnabledTaskMain = true;
             EnabledResults = true;
             EditingVisible = false;
+            if(Results != null)Results.Timer.Stop();
             SettingsApp = new TestSettingsViewModel();
             EditorUC = new TestSettings();
         }
@@ -50,6 +51,7 @@ namespace EntranseTesting.ViewModels
             EnabledSettings = true;
             EnabledResults = true;
             EditingVisible = true;
+            if (Results != null) Results.Timer.Stop();
             TaskMainPage = new TaskMainViewModel();
             EditorUC = new TaskMain();
         }

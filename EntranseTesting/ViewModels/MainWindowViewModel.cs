@@ -216,6 +216,7 @@ namespace EntranseTesting.ViewModels
             if (typeof(EditorPage) == UC.GetType())
             {
                 EditorPages.EditingVisible = false;
+                if (EditorPages.Results != null) EditorPages.Results.Timer.Stop();
             }
             if (typeof(TestPage) == UC.GetType())
             {
@@ -479,11 +480,13 @@ namespace EntranseTesting.ViewModels
             UserResultVisible = true;
             UserResult = new UserResultViewModel(idSession);
             UC = new UserResultPage();
+            EditorPages.Results.Timer.Stop();
         }
         public void ClickToAllResult()
         {
             UserResultVisible = false;
             UC = new EditorPage();
+            EditorPages.Results.Timer.Start();
         }
     }
 }
