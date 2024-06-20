@@ -232,6 +232,9 @@ namespace EntranseTesting.ViewModels
                             return;
                         }
                 }
+
+                foreach (var item in TestMain.TestPages.ProgressButtons)
+                    item.Check = false;
                 ButtonVisible = false;
                 Response.timer.Stop();
             }
@@ -424,6 +427,8 @@ namespace EntranseTesting.ViewModels
             if (reSave) return;
             try
             {
+                foreach (var item in TestMain.TestPages.ProgressButtons)
+                    item.Check = false;
                 ButtonVisible = false;
                 TestMain.changeResponse();//сохраняем ответ последнего задания
                 EntranceTestingContext connection = new EntranceTestingContext();

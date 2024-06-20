@@ -35,7 +35,7 @@ namespace EntranseTesting.ViewModels
         bool visibleHint = false;
         List<QuestionHint> hints = new List<QuestionHint>();
         [ObservableProperty] List<Question> questionsCollection;
-        [ObservableProperty] List<ItemProgressButton> progressButtons = new List<ItemProgressButton>();
+        List<ItemProgressButton> progressButtons = new List<ItemProgressButton>();
         int takeItem = 5;
         int skipItem = 0;
         List<ItemProgressButton> takeProgressButtons = new List<ItemProgressButton>();
@@ -49,8 +49,21 @@ namespace EntranseTesting.ViewModels
         [ObservableProperty] TestMatchTheValueViewModel testMV;//соотношение величин
         public TestPageViewModel()
         {
-            EntranceTestingContext baseConnection = new EntranceTestingContext();
-            SettingTest = baseConnection.AppSettings.ToList().Last();
+            EntranceTestingContext baseConnection = new EntranceTestingContext();            
+            SettingTest = baseConnection.AppSettings.ToList().LastOrDefault();
+            if (SettingTest == null)
+            {
+                SettingTest = new AppSetting()
+                {
+                    Time = new TimeSpan(0, 45, 0),
+                    CountOfQuestions = 30,
+                    HintVisibility = false,
+                    CountOfHints = 0,
+                    Raiting5 = 30,
+                    Raiting4 = 23,
+                    Raiting3 = 16
+                };
+            }
             CountQuestion = SettingTest.CountOfQuestions;
 
             //получаем весь список вопросов из базы
@@ -62,6 +75,8 @@ namespace EntranseTesting.ViewModels
 
             //кнопки навигации
             CountQuestion = (QuestionsCollection.Count == SettingTest.CountOfQuestions) ? SettingTest.CountOfQuestions : (QuestionsCollection.Count > SettingTest.CountOfQuestions) ? SettingTest.CountOfQuestions : QuestionsCollection.Count;
+
+            ProgressButtons.Clear();
             for (int i = 0; i < CountQuestion; i++)
                 ProgressButtons.Add(new ItemProgressButton(i + 1));
             ProgressButtons[0].Active = true;
@@ -92,6 +107,8 @@ namespace EntranseTesting.ViewModels
         public bool VisibleHint { get => visibleHint; set { visibleHint = value; OnPropertyChanged("VisibleHint"); OnPropertyChanged("NoVisibleHint"); } }
         public bool NoVisibleHint { get => !visibleHint; }
         public string ButtonValue { get => buttonValue; set { buttonValue = value; OnPropertyChanged("ButtonValue"); } }
+
+        public List<ItemProgressButton> ProgressButtons { get => progressButtons; set {progressButtons = value; OnPropertyChanged("ProgressButtons"); } }
 
         public void Next()
         {
